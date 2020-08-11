@@ -3,9 +3,10 @@
 
 int main() {
     bool rmajor = true;  // specify row-major layout
-    // specify 2D qubit arrangement
+    // specify 2D qubit arrangement and neighborhood activation level
     unsigned int nrows = 5;
     unsigned int ncols = 5;
+    unsigned int level = 2;
     unsigned int nqubits = nrows * ncols;
     // prepare initial condition
     char * state = initBitString(nqubits);
@@ -21,7 +22,7 @@ int main() {
     // apply the circuit
     unsigned int ncycles = 100;
     for(int i=0; i<ncycles; ++i) {
-        updateQubits();
+        updateQubits(qubits, nrows, ncols, level);
     }
     // cleanup
     destroyQureg(qubits, runtime);

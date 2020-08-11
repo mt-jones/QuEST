@@ -98,8 +98,11 @@ unsigned int * getNeighborhood(unsigned int row,
     return out;
 }
 
-void updateQubits() {
-
+void updateQubits(Qureg qubits,
+                  unsigned int nrows,
+                  unsigned int ncols,
+                  unsigned int level) {
+    // update qubits according to activation level under a specific stride pattern
 }
 
 #endif
