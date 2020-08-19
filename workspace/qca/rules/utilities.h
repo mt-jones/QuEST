@@ -3,12 +3,36 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
 #include "../../../QuEST/include/QuEST.h"
 
 #pragma once
 #if !defined UTILITIES_H
 #define UTILITIES_H
+#define INVALID UINT_MAX
+
+unsigned int * appendArray(unsigned int * arr,
+                 unsigned int * vals,
+                 unsigned int nvals) {
+    unsigned int len = 0;
+    if (arr != NULL) {
+        len = arr[0];
+    }
+    arr = (unsigned int *) realloc(arr, (len+nvals+1)*sizeof(unsigned int));
+    for (unsigned int i = 0; i < nvals; ++i) {
+        arr[len+i+1] = vals[i];
+    }
+    arr[0] = len + nvals;
+    return arr;
+}
+
+unsigned int * initArray() {
+    unsigned int nout = 0, nvals = 0;
+    unsigned int * out = NULL;
+    out = appendArray(out, &nout, nvals);
+    return out;
+}
 
 unsigned int getStateIndex(char * bitstring,
                            unsigned int base) {
@@ -42,29 +66,67 @@ unsigned int nCr(unsigned int n,
     return result;
 }
 
-char * bitsFromVal(unsigned int val,
-                   unsigned int nbits) {
+char * getBinary(unsigned int val,
+                 unsigned int nbits) {
     char * out = (char *) calloc(nbits, sizeof(char));
     for (unsigned int i = 0; i < nbits; ++i) {
         out[i] = '0';
     }
     unsigned int index = 0;
-    for (unsigned int i = 1 << (nbits-1); i > 0; i = i / 2) {
+    for (unsigned int i = 1<<(nbits-1); i > 0; i = i/2) {
         out[index] = (val & i) ? '1' : '0';
         index = index + 1;
     }
     return out;
 }
 
-unsigned int getLevel(char * neighbors,
-                      unsigned int nhood) {
-    unsigned int out = 0;
-    for (unsigned int i = 0; i < nhood-1; ++i) {
-        char level = neighbors[i];
-        out = out + strtoull(&level, NULL, 10);
+unsigned int getTarget(unsigned int * neighborhood) {
+    unsigned int center = (unsigned int) floor(neighborhood[0] / 2);
+    unsigned int out = neighborhood[center+1];
+    return out;
+}
+
+unsigned int * getControls(unsigned int * neighborhood) {
+    unsigned int * out = initArray();
+    unsigned int val, nvals = 1;
+    unsigned int center = (unsigned int) floor(neighborhood[0] / 2);
+    for (unsigned int i = 0; i < neighborhood[0]; ++i) {
+        if (i != center) {
+            val = neighborhood[i+1];
+            if (val != INVALID) {
+                out = appendArray(out, &val, nvals);
+            }
+        }
     }
     return out;
 }
+
+unsigned int getLevel(char * neighbors,
+                      unsigned int nhood) {
+    unsigned int out = 0, base = 10;
+    for (unsigned int i = 0; i < nhood-1; ++i) {
+        char level = neighbors[i];
+        out = out + strtoull(&level, NULL, base);
+    }
+    return out;
+}
+
+unsigned int * getLevels(unsigned int rule,
+                         unsigned int nhood) {
+    unsigned int val, nvals = 1;
+    unsigned int * out = initArray();
+    char * binrule = getBinary(rule, nhood);
+    for (unsigned int i = 0; i < nhood; ++i) {
+        char bit = binrule[i];
+        val = (nhood - 1) - i;
+        if (bit == '1') {
+            out = appendArray(out, &val, nvals);
+        }
+    }
+    free(binrule);
+    return out;
+}
+
 
 char ** getTotalisticRule(unsigned int level,
                           unsigned int nhood) {
@@ -81,7 +143,7 @@ char ** getTotalisticRule(unsigned int level,
     unsigned int index = 0;
     unsigned int center = (unsigned int) floor(nhood / 2);
     for (unsigned int i = 0; i < nnhoods; ++i) {
-        neighbors = bitsFromVal(i, nhood-1);
+        neighbors = getBinary(i, nhood-1);
         if (getLevel(neighbors, nhood) == level) {
             for (unsigned int j = 0; j < nhood-1; ++j) {
                 if (j < center) {
@@ -99,27 +161,22 @@ char ** getTotalisticRule(unsigned int level,
 
 unsigned int * getPauliXTargets(char * signature,
                                 unsigned int * controls) {
-    unsigned int * out = NULL;
-    unsigned int nbits = (*signature) / sizeof(char);
-    unsigned int ncontrols = (*controls) / sizeof(char);
-    if (nbits == ncontrols+1){
-        return out;
-    }
-    unsigned int center = (unsigned int) floor(nbits / 2);
-    for (unsigned int i = 0; i < nbits; ++i) {
+    unsigned int * out = initArray();
+    unsigned int val, nvals = 1;
+    unsigned int center = (unsigned int) floor(controls[0]+1 / 2);
+    for (unsigned int i = 0; i < controls[0]+1; ++i) {
         char bit = '\0';
         if (i != center) {
             bit = signature[i];
         }
-        if (!strcmp(&bit, "0")) {
-            unsigned int nout = (*out) / sizeof(unsigned int);
-            out = (unsigned int *) realloc(out, nout);
+        if (bit == '0') {
             if (i < center) {
-                out[nout-1] = controls[i];
+                val = controls[i+1];
             }
             if (center < i) {
-                out[nout-1] = controls[i+center-1];
+                val = controls[i+center];
             }
+            out = appendArray(out, &val, nvals);
         }
     }
     return out;
@@ -127,10 +184,23 @@ unsigned int * getPauliXTargets(char * signature,
 
 void multiPauliX(Qureg qubits,
                  unsigned int * targets) {
-    unsigned int ntargets = sizeof(*targets) / sizeof(unsigned int);
-    for (unsigned int i = 0; i < ntargets; ++i) {
-        pauliX(qubits, targets[i]);
+    for (unsigned int i = 0; i < targets[0]; ++i) {
+        pauliX(qubits, targets[i+1]);
     }
+}
+
+ComplexMatrix2 getActivator(char * name) {
+    ComplexMatrix2 activator;
+    if (!strcmp(name, "hadamard")) {
+        double scale = 1/sqrt(2);
+        activator = (ComplexMatrix2) {
+            .real={{scale,  scale},
+                   {scale, -scale}},
+            .imag={{0,  0},
+                   {0,  0}}
+        };
+    }
+    return activator;
 }
 
 void multiControlledActivator(Qureg qubits,
@@ -138,15 +208,13 @@ void multiControlledActivator(Qureg qubits,
                               unsigned int target,
                               unsigned int level,
                               ComplexMatrix2 activator) {
-    unsigned int ncontrols = sizeof(*controls) / sizeof(unsigned int);
-    unsigned int nsignatures = nCr(ncontrols, level);
-    char ** signatures = getTotalisticRule(level, ncontrols+1);
-    unsigned int center = (unsigned int) floor(ncontrols+1 / 2);
+    unsigned int nsignatures = nCr(controls[0], level);
+    char ** signatures = getTotalisticRule(level, controls[0]+1);
     for (unsigned int i = 0; i < nsignatures; ++i) {
         char * signature = signatures[i];
         unsigned int * ptargets = getPauliXTargets(signature, controls);
         multiPauliX(qubits, ptargets);
-        multiControlledUnitary(qubits, (int *) controls, ncontrols, target, activator);
+        multiControlledUnitary(qubits, (int *) &controls[1], controls[0], target, activator);
         multiPauliX(qubits, ptargets);
         free(ptargets);
     }

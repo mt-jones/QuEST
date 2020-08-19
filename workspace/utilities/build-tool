@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+clean() {
+    echo "----------------------------"
+    echo "| cleaning build directory |"
+    echo "----------------------------"
+    if [[ -d "build" ]]
+    then
+        rm -rf build
+    fi
+}
+
+configure() {
+    echo "--------------------------"
+    echo "| configuring with cmake |"
+    echo "--------------------------"
+    mkdir -p build
+    if [[ -d "build" ]]
+    then
+        echo -e "changing to build directory and configuring"
+        cd build
+        cmake $QUEST_ROOT -DPRECISION=2 \
+                          -DMULTITHREADED=OFF \
+                          -DDISTRIBUTED=OFF \
+                          -DGPUACCELERATED=ON \
+                          -DGPU_COMPUTE_CAPABILITY=75 \
+                          -DUSER_SOURCE=$USER_SOURCE \
+                          -DOUTPUT_EXE=$OUTPUT_EXE
+    fi
+}
+
+compile() {
+    echo "-------------------------------------"
+    echo "| compiling with generated makefile |"
+    echo "-------------------------------------"
+    if [[ -f "Makefile" ]]
+    then
+        make -j
+    fi
+}
+
+if [[ $1 = "-h" ]] || [[ $1 = "--help" ]]
+then
+    echo ""
+    echo "usage:"
+    echo "  ./build-tool.sh QUEST_ROOT USER_SOURCE OUTPUT_EXE"
+    echo "(e.g.)"
+    echo "  ./build-tool.sh /path/to/QuEST /path/to/code.c exe_code"
+    echo ""
+    echo "argument descriptions:"
+    echo "  QUEST_ROOT:  absolute path to QuEST source"
+    echo "  USER_SOURCE: absolute path to user defined source code (written in C)"
+    echo "  OUTPUT_EXE:  name of output executable"
+    echo ""
+    exit 0
+else
+    QUEST_ROOT=$1
+    USER_SOURCE=$2
+    OUTPUT_EXE=$3
+
+    clean && configure && compile
+fi
