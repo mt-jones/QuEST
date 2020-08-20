@@ -13,30 +13,29 @@ int main() {
     // prepare initial condition
     char * state = initBitString(nqubits);
     setState(state, nrows, ncols, rmajor, "W");
-    printf("--------------------------\n");
-    printf("| Printing initial cond. |\n");
-    printf("--------------------------\n");
-    printState(state, nrows, ncols, rmajor);
+    printStatusMessage("Printing initial cond.");
+    printProductState(state, nrows, ncols, rmajor);
     // prepare runtime environment
     QuESTEnv runtime = createQuESTEnv();
     // prepare qubit system with initial condition
     Qureg qubits = createQureg(nqubits, runtime);
     initClassicalState(qubits, getStateIndex(state, 2));
     // report execution environment and quantum system
-    printf("--------------------------------------------\n");
-    printf("| Printing simulated quantum register info |\n");
-    printf("--------------------------------------------\n");
+    printStatusMessage("Printing simulated quantum register and runtime info");
     reportQuregParams(qubits);
     reportQuESTEnv(runtime);
     // apply the circuit
     unsigned int ncycles = 1;
-    printf("------------------------------------\n");
-    printf("| Applying cycles onto the circuit |\n");
-    printf("------------------------------------\n");
-    for(int i = 0; i < ncycles; ++i) {
+    printStatusMessage("Cycling the circuit");
+    char buffer[80];
+    for(unsigned int i = 0; i < ncycles; ++i) {
+        sprintf(buffer, "cycle: %u", i);
+        printStatusMessage(buffer);
         updateQubits(qubits, nrows, ncols, levels, activator, rmajor);
     }
+    syncQuESTEnv(runtime);
     // cleanup
+    printStatusMessage("Finished; cleaning up");
     free(state);
     destroyQureg(qubits, runtime);
     destroyQuESTEnv(runtime);
