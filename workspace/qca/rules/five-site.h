@@ -107,7 +107,7 @@ void printProductState(char * state,
     char buffer[bsize];
     int length = sprintf(buffer, "|");
     for (unsigned int i = 0; i < nrows; ++i) {
-        length = length + sprintf(buffer, "%2c%1s|", 0, "");
+        length = length + sprintf(buffer, "%2c%1s|", '0', "");
     }
     char pad = '-';
     char padding[length+1];
@@ -128,6 +128,36 @@ void printProductState(char * state,
     }
 }
 
+void printProbabilityGrid(Qureg qubits,
+                          unsigned int nrows,
+                          unsigned int ncols,
+                          int outcome,
+                          bool rmajor) {
+    unsigned int bsize = 80;
+    char buffer[bsize];
+    int length = sprintf(buffer, "|");
+    for (unsigned int i = 0; i < nrows; ++i) {
+        length = length + sprintf(buffer, "%1s%4.2f%1s|", "", (double) 0, "");
+    }
+    char pad = '-';
+    char padding[length+1];
+    for (int i = 0; i < length; ++i) {
+        padding[i] = pad;
+    }
+    padding[length] = '\0';
+    printf("%s\n", padding);
+    for (unsigned int j = 0; j < ncols; ++j) {
+        sprintf(buffer, "|");
+        printf("%s", buffer);
+        for (unsigned int i = 0; i < nrows; ++i) {
+            unsigned int index = get1dIndex(i, j, nrows, ncols, rmajor);
+            sprintf(buffer, "%1s%4.2f%1s|", "", calcProbOfOutcome(qubits, index, outcome), "");
+            printf("%s", buffer);
+        }
+        printf("\n%s\n", padding);
+    }
+}
+
 void printNeighborhood(unsigned int * neighborhood,
                        unsigned int nrows,
                        unsigned int ncols,
@@ -137,13 +167,13 @@ void printNeighborhood(unsigned int * neighborhood,
     unsigned int * center = get2dIndex(index, nrows, ncols, rmajor);
     unsigned int bsize = 80;
     char buffer[bsize];
-    int length = sprintf(buffer, "| %2s [%2u; %2u %2u] %2s", "c:", index, center[1], center[2], "");
+    int length = sprintf(buffer, "| %2s [%2u; %2u, %2u]%1s", "c:", index, center[1], center[2], "");
     for (unsigned int i = 0; i < neighborhood[0]; ++i) {
         if (i+1 != cindex+1) {
             unsigned int val = neighborhood[i+1];
             if(val != INVALID) {
                 unsigned int * control = get2dIndex(val, nrows, ncols, rmajor);
-                length = length + sprintf(buffer, "%2s [%2u; %2u %2u] %2s", "ctrl:", val, control[1], control[2], "");
+                length = length + sprintf(buffer, "%2s [%2u; %2u, %2u]%1s", "ctrl:", val, control[1], control[2], "");
                 free(control);
             }
         }
@@ -156,14 +186,14 @@ void printNeighborhood(unsigned int * neighborhood,
     }
     padding[length] = '\0';
     printf("%s\n", padding);
-    sprintf(buffer, "| %2s [%2u; %2u %2u] %2s", "c:", index, center[1], center[2], "");
+    sprintf(buffer, "| %2s [%2u; %2u, %2u]%1s", "c:", index, center[1], center[2], "");
     printf("%s", buffer);
     for (unsigned int i = 0; i < neighborhood[0]; ++i) {
         if (i+1 != cindex+1) {
             unsigned int val = neighborhood[i+1];
             if(val != INVALID) {
                 unsigned int * control = get2dIndex(val, nrows, ncols, rmajor);
-                sprintf(buffer, "%2s [%2u; %2u %2u] %2s", "ctrl:", val, control[1], control[2], "");
+                sprintf(buffer, "%2s [%2u; %2u, %2u]%1s", "ctrl:", val, control[1], control[2], "");
                 printf("%s", buffer);
                 free(control);
             }
@@ -204,15 +234,15 @@ void updateQubits(Qureg qubits,
                   bool rmajor) {
     unsigned int nlevels = levels[0];
     for (unsigned int offset = 0; offset < 2; ++offset) {
-        for (unsigned int i = offset; i < nrows; i = i+2) {
-            for (unsigned int j = offset; j < ncols; j = j+2) {
+        for (unsigned int i = 0; i < nrows; ++i) {
+            for (unsigned int j = (i+offset)%2; j < ncols; j = j+2) {
                 unsigned int * neighborhood = getNeighborhood(i, j, nrows, ncols, rmajor);
                 unsigned int * controls = getControls(neighborhood);
                 unsigned int target = getTarget(neighborhood);
-                printNeighborhood(neighborhood, nrows, ncols, rmajor);
+                // printNeighborhood(neighborhood, nrows, ncols, rmajor);
                 for (unsigned int k = 0; k < nlevels; ++k) {
                     unsigned int level = levels[k+1];
-                    multiControlledActivator(qubits, controls, target, level, activator);
+                    multiControlledActivator(qubits, controls, NHOOD, target, level, activator);
                 }
                 free(neighborhood);
                 free(controls);
