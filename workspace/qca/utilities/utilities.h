@@ -1,29 +1,27 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <limits.h>
-
-#include "../../../QuEST/include/QuEST.h"
+#include "../external/external.h"
 
 #pragma once
 #if !defined UTILITIES_H
 #define UTILITIES_H
 #define INVALID UINT_MAX
 
-void printStatusMessage(char * message) {
-        char buffer[80];
-        int length = sprintf(buffer, "| %s |", message);
-        char pad = '-';
-        char padding[length+1];
-        for (int i = 0; i < length; ++i) {
-            padding[i] = pad;
-        }
-        padding[length] = '\0';
-        printf("%s\n", padding);
-        printf("%s\n", buffer);
-        printf("%s\n", padding);
+unsigned int nCr(unsigned int n,
+                 unsigned int r) {
+    if (n < r) {
+        return 0;
+    }
+    if (n < 2 * r) {
+        r = n - r;
+    }
+    if (r == 0) {
+        return 1;
+    }
+    unsigned int result = n;
+    for(unsigned int i = 2; i <= r; ++i) {
+        result *= (n - i + 1);
+        result /= i;
+    }
+    return result;
 }
 
 unsigned int * appendArray(unsigned int * arr,
@@ -48,6 +46,18 @@ unsigned int * initArray() {
     return out;
 }
 
+unsigned int * getValidValues(unsigned int * arr) {
+    unsigned int * out = initArray();
+    unsigned int val, nvals = 1;
+    for (unsigned int i = 0; i < arr[0]; ++i) {
+        unsigned int val = arr[i+1];
+        if (val != INVALID) {
+            out = appendArray(out, &val, nvals);
+        }
+    }
+    return out;
+}
+
 unsigned int getStateIndex(char * bitstring,
                            unsigned int base) {
     unsigned int out;
@@ -65,25 +75,6 @@ char * initBitString(unsigned int len) {
     return out;
 }
 
-unsigned int nCr(unsigned int n,
-                 unsigned int r) {
-    if (n < r) {
-        return 0;
-    }
-    if (n < 2 * r) {
-        r = n - r;
-    }
-    if (r == 0) {
-        return 1;
-    }
-    unsigned int result = n;
-    for(unsigned int i = 2; i <= r; ++i) {
-        result *= (n - i + 1);
-        result /= i;
-    }
-    return result;
-}
-
 char * getBinary(unsigned int val,
                  unsigned int nbits) {
     char * out = (char *) calloc(nbits, sizeof(char));
@@ -94,37 +85,6 @@ char * getBinary(unsigned int val,
     for (unsigned int i = 1<<(nbits-1); i > 0; i = i/2) {
         out[index] = (val & i) ? '1' : '0';
         index = index + 1;
-    }
-    return out;
-}
-
-unsigned int * getValidValues(unsigned int * arr) {
-    unsigned int * out = initArray();
-    unsigned int val, nvals = 1;
-    for (unsigned int i = 0; i < arr[0]; ++i) {
-        unsigned int val = arr[i+1];
-        if (val != INVALID) {
-            out = appendArray(out, &val, nvals);
-        }
-    }
-    return out;
-}
-
-unsigned int getTarget(unsigned int * neighborhood) {
-    unsigned int center = (unsigned int) floor(neighborhood[0] / 2);
-    unsigned int out = neighborhood[center+1];
-    return out;
-}
-
-unsigned int * getControls(unsigned int * neighborhood) {
-    unsigned int * out = initArray();
-    unsigned int val, nvals = 1;
-    unsigned int center = (unsigned int) floor(neighborhood[0] / 2);
-    for (unsigned int i = 0; i < neighborhood[0]; ++i) {
-        if (i != center) {
-            val = neighborhood[i+1];
-            out = appendArray(out, &val, nvals);
-        }
     }
     return out;
 }
@@ -155,7 +115,6 @@ unsigned int * getLevels(unsigned int rule,
     return out;
 }
 
-
 char ** getTotalisticRule(unsigned int level,
                           unsigned int nhood) {
     unsigned int nvalid = nCr(nhood-1, level);
@@ -182,6 +141,25 @@ char ** getTotalisticRule(unsigned int level,
             index = index + 1;
         }
         free(neighbors);
+    }
+    return out;
+}
+
+unsigned int getTarget(unsigned int * neighborhood) {
+    unsigned int center = (unsigned int) floor(neighborhood[0] / 2);
+    unsigned int out = neighborhood[center+1];
+    return out;
+}
+
+unsigned int * getControls(unsigned int * neighborhood) {
+    unsigned int * out = initArray();
+    unsigned int val, nvals = 1;
+    unsigned int center = (unsigned int) floor(neighborhood[0] / 2);
+    for (unsigned int i = 0; i < neighborhood[0]; ++i) {
+        if (i != center) {
+            val = neighborhood[i+1];
+            out = appendArray(out, &val, nvals);
+        }
     }
     return out;
 }
