@@ -8,7 +8,7 @@ int main() {
     // specify 2D qubit arrangement, neighborhood activation level, activator
     unsigned int nrows = 5;
     unsigned int ncols = 5;
-    unsigned int rule = 4;
+    unsigned int rule = 12;
     unsigned int * levels = getLevels(rule, NHOOD);  // utilities/utilities.h
     sprintf(buffer, "Rule: %u", rule);
     printStatusMessage(buffer);  // logging/logging.h
@@ -17,7 +17,7 @@ int main() {
         printStatusMessage(buffer);  // logging/logging.h
     }
     unsigned int nqubits = nrows * ncols;
-    ComplexMatrix2 activator = getActivator("Hadamard");  // utilities/utilities.h
+    ComplexMatrix2 activator = getActivator("Sqrt-Hadamard");  // utilities/utilities.h
     // prepare initial condition
     printStatusMessage("Printing initial cond.");  // logging/logging.h
     char * state = initBitString(nqubits);
@@ -39,7 +39,7 @@ int main() {
     int outcome = 1;
     printStatusMessage("Initial probability grid");  // logging/logging.h
     printProbabilityGrid(qubits, nrows, ncols, outcome, rmajor);  // rules/five-site/logging.h
-    unsigned int ncycles = 1;
+    unsigned int ncycles = 4;
     for(unsigned int i = 0; i < ncycles; ++i) {
         updateQubits(qubits, nrows, ncols, levels, activator, rmajor, verbose);  // rules/five-site/five-site.h
         syncQuESTEnv(runtime);

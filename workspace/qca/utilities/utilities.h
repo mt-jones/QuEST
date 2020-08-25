@@ -201,28 +201,33 @@ void multiPauliX(Qureg qubits,
 ComplexMatrix2 getActivator(char * name) {
     ComplexMatrix2 activator;
     if (!strcmp(name, "Hadamard")) {
-        double val = 1/sqrt(2);
+        double reval[4] = {1/sqrt(2), 1/sqrt(2),
+                          1/sqrt(2), -1/sqrt(2)};
         activator = (ComplexMatrix2) {
-            .real={{val,  val},
-                   {val, -val}},
-            .imag={{0,  0},
-                   {0,  0}}
+            .real={{reval[0], reval[1]},
+                   {reval[2], reval[3]}},
+            .imag={{0, 0},
+                   {0, 0}}
         };
     } else if (!strcmp(name, "Sqrt-Hadamard")) {
-        double val = 1;
+        double reval[4] = {0.25 * (2 + sqrt(2)), 0.5 * 1/sqrt(2),
+                           0.5 * 1/sqrt(2), 0.25 * (2 - sqrt(2))};
+        double imval[4] = {0.25 * (2 - sqrt(2)), -0.5 * 1/sqrt(2),
+                           -0.5 * 1/sqrt(2), 0.25 * (2 + sqrt(2))};
         activator = (ComplexMatrix2) {
-            .real={{0,   val},
-                   {val,  0}},
-            .imag={{0,  0},
-                   {0,  0}}
+            .real={{reval[0], reval[1]},
+                   {reval[2], reval[3]}},
+            .imag={{imval[0], imval[1]},
+                   {imval[2], imval[3]}}
         };
     } else if (!strcmp(name, "Pauli-X")) {
-        double val = 1;
+        double reval[4] = {0, 1,
+                           1, 0};
         activator = (ComplexMatrix2) {
-            .real={{0,   val},
-                   {val,  0}},
-            .imag={{0,  0},
-                   {0,  0}}
+            .real={{reval[0], reval[1]},
+                   {reval[2], reval[3]}},
+            .imag={{0, 0},
+                   {0, 0}}
         };
     }
     return activator;
