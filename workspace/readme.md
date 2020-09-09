@@ -44,7 +44,7 @@ build-utilities/
 * `build-utilities` defines build utilities for compiling QuEST projects.
 ## Compilation and execution
 1. Clone this project.
-2. Edit `build-qca` so that `QUEST_ROOT` is the absolute path to QuEST source.
+2. Edit `build-qca` so that `QUEST_ROOT` is the absolute path to QuEST source, and the options are appropriate for the target system
 3. Execute this command
 ```bash
 cd qca/
