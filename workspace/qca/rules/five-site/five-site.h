@@ -7,6 +7,17 @@
 #define FIVE_SITE_H
 #define NHOOD 5
 
+const char * argNames[] = {"rmajor",
+                           "verbose",
+                           "nrows",
+                           "ncols",
+                           "rule",
+                           "activator",
+                           "ic",
+                           "ncycles"};
+
+const unsigned int numArgNames = sizeof(argNames) / sizeof(char *);
+
 unsigned int * getNeighborhood(unsigned int row,
                                unsigned int col,
                                unsigned int nrows,

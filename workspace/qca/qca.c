@@ -1,15 +1,42 @@
 #include "external/external.h"
 #include "rules/five-site/five-site.h"
 
-int main() {
+int main(int argc, char * argv[]) {
     char buffer[256];
+    if (argc != numArgNames+1) {
+        sprintf(buffer, "%s", "invalid number of command line arguments");
+        printStatusMessage(buffer);  // logging/logging.h
+        exit(EXIT_FAILURE);
+    }
+    sprintf(buffer, "%s", "Printing command line inputs");
+    printStatusMessage(buffer);  // logging/logging.h
+    char * argVals[numArgNames];
+    for (int i = 1; i < argc; ++i) {
+        char * arg = argv[i];
+        char * token = strtok(arg, "=");
+        for (unsigned int j = 0; j < numArgNames; ++j) {
+            const char * argName = argNames[j];
+            if (!strcmp(token, argName)) {
+                token = strtok(NULL, "=");
+                argVals[j] = token;
+            }
+        }
+    }
+    for (unsigned int i = 0; i < numArgNames; ++i) {
+        sprintf(buffer, "%s: %s", argNames[i], argVals[i]);
+        printStatusMessage(buffer);  // logging/logging.h
+    }
     bool rmajor = true;  // specify row-major layout
     bool verbose = false;  // specify verbosity in update functions
     // specify 2D qubit arrangement, neighborhood activation level, activator
-    unsigned int nrows = 3;
-    unsigned int ncols = 3;
-    unsigned int rule = 12;
+    char * endptr = NULL;
+    unsigned int inputBase = 10;
+    unsigned int nrows = strtoul(argVals[2], &endptr, inputBase);
+    unsigned int ncols = strtoul(argVals[3], &endptr, inputBase);
+    unsigned int rule = strtoul(argVals[4], &endptr, inputBase);
     unsigned int * levels = getLevels(rule, NHOOD);  // utilities/utilities.h
+    sprintf(buffer, "%s", "Printing simulation details");
+    printStatusMessage(buffer);  // logging/logging.h
     sprintf(buffer, "Rule: %u", rule);
     printStatusMessage(buffer);  // logging/logging.h
     for (unsigned int i = 0; i < levels[0]; ++i) {
@@ -17,9 +44,10 @@ int main() {
         printStatusMessage(buffer);  // logging/logging.h
     }
     unsigned int nqubits = nrows * ncols;
-    ComplexMatrix2 activator = getActivator("Sqrt-Hadamard");  // utilities/utilities.h
+    char * aname = argVals[5];
+    ComplexMatrix2 activator = getActivator(aname);  // utilities/utilities.h
     // prepare initial condition
-    char * ic = "W";
+    char * ic = argVals[6];
     printStatusMessage("Printing initial cond.");  // logging/logging.h
     char * state = initBitString(nqubits);
     setState(state, nrows, ncols, rmajor, ic);  // rules/five-site/utilities.h
@@ -29,8 +57,8 @@ int main() {
     // prepare qubit system with initial condition
     Qureg qubits = createQureg(nqubits, runtime);
     Qureg workspace = createQureg(nqubits, runtime);
-    unsigned int base = 2;
-    unsigned int index = getStateIndex(state, base);  // utilities/utilities.h
+    unsigned int indexBase = 2;
+    unsigned int index = getStateIndex(state, indexBase);  // utilities/utilities.h
     initClassicalState(qubits, index);  // utilities/utilities.h
     // report execution environment and quantum system
     printStatusMessage("Printing simulated quantum register and runtime info");  // logging/logging.h
@@ -45,7 +73,7 @@ int main() {
     int outcome = 1;
     printStatusMessage("Initial probability grid");  // logging/logging.h
     printProbabilityGrid(qubits, nrows, ncols, outcome, rmajor);  // rules/five-site/logging.h
-    unsigned int ncycles = 1;
+    unsigned int ncycles = strtoul(argVals[7], &endptr, inputBase);
     for(unsigned int i = 0; i < ncycles; ++i) {
         updateQubits(qubits, nrows, ncols, levels, activator, rmajor, verbose);  // rules/five-site/five-site.h
         syncQuESTEnv(runtime);

@@ -19,11 +19,11 @@ configure() {
     then
         echo -e "changing to build directory and configuring"
         cd build
-        cmake $QUEST_ROOT -DPRECISION=2 \
-                          -DMULTITHREADED=OFF \
-                          -DDISTRIBUTED=OFF \
-                          -DGPUACCELERATED=ON \
-                          -DGPU_COMPUTE_CAPABILITY=75 \
+        cmake $QUEST_ROOT -DPRECISION=$PRECISION \
+                          -DMULTITHREADED=$MULTITHREADED \
+                          -DDISTRIBUTED=$DISTRIBUTED \
+                          -DGPUACCELERATED=$GPUACCELERATED \
+                          -DGPU_COMPUTE_CAPABILITY=$GPUCOMPUTECAPABILITY \
                           -DUSER_SOURCE=$USER_SOURCE \
                           -DOUTPUT_EXE=$OUTPUT_EXE
     fi
@@ -55,8 +55,13 @@ then
     exit 0
 else
     QUEST_ROOT=$1
-    USER_SOURCE=$2
-    OUTPUT_EXE=$3
+    PRECISION=$2
+    MULTITHREADED=$3
+    DISTRIBUTED=$4
+    GPUACCELERATED=$5
+    GPUCOMPUTECAPABILITY=$6
+    USER_SOURCE=$7
+    OUTPUT_EXE=$8
 
     clean && configure && compile
 fi

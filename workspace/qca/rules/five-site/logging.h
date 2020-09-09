@@ -40,10 +40,11 @@ void printProbabilityGrid(Qureg qubits,
                           int outcome,
                           bool rmajor) {
     unsigned int bsize = 80;
+    const char * format = "%1s%5.2f%1s|";
     char buffer[bsize];
     int length = sprintf(buffer, "|");
     for (unsigned int i = 0; i < nrows; ++i) {
-        length = length + sprintf(buffer, "%1s%4.2f%1s|", "", (double) 0, "");
+        length = length + sprintf(buffer, format, "", (double) 0, "");
     }
     char pad = '-';
     char padding[length+1];
@@ -57,7 +58,7 @@ void printProbabilityGrid(Qureg qubits,
         printf("%s", buffer);
         for (unsigned int i = 0; i < nrows; ++i) {
             unsigned int index = get1dIndex(i, j, nrows, ncols, rmajor);
-            sprintf(buffer, "%1s%4.2f%1s|", "", calcProbOfOutcome(qubits, index, outcome), "");
+            sprintf(buffer, format, "", calcProbOfOutcome(qubits, index, outcome), "");
             printf("%s", buffer);
         }
         printf("\n%s\n", padding);
