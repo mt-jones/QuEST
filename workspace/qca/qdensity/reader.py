@@ -105,10 +105,9 @@ def _get_qubit_density_terms(qubit_density_data):
             qindices = local_qubit_density[0]
             pindices = local_qubit_density[1]
             coeff = local_qubit_density[2]
-            if np.abs(coeff) > 0:
-                matrices = [paulis[pindex] for pindex in pindices]
-                local_density_matrix = ft.reduce(lambda a, b: np.kron(a, b), matrices)
-                _qubit_density_terms.append((qindices, local_density_matrix, coeff))
+            matrices = [paulis[pindex] for pindex in pindices]
+            local_density_matrix = ft.reduce(lambda a, b: np.kron(a, b), matrices)
+            _qubit_density_terms.append((qindices, local_density_matrix, coeff))
         if len(_qubit_density_terms) > 0:
             qubit_density_terms.append(_qubit_density_terms)
     return qubit_density_terms
