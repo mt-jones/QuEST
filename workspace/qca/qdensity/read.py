@@ -127,7 +127,7 @@ def _get_qubit_densities(qubit_density_terms):
         qubit_densities.append(_qubit_densities)
     return qubit_densities
 
-def get_qubit_densities(filepaths):
+def qubit_densities(filepaths):
     binary_qubit_density_data = _read_binary_qubit_density_data(filepaths)
     qubit_density_data = _process_binary_qubit_density_data(binary_qubit_density_data)
     qubit_density_terms = _get_qubit_density_terms(qubit_density_data)

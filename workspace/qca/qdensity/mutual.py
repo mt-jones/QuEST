@@ -33,7 +33,7 @@ def _information(single_qubit_densities, two_qubit_densities):
                         mutual_information.append([two_qubit_index, 0.5 * np.abs(single_qubit_entropyi + single_qubit_entropyj - two_qubit_entropy)])
     return mutual_information
 
-def _process_information(mutual_information):
+def _get_information_matrix(mutual_information):
     max_mutual_index = 0
     for mutual_index, mutual_info in mutual_information:
         index = max(mutual_index)
@@ -48,6 +48,6 @@ def information(single_qubit_densities_list, two_qubit_densities_list):
     if len(single_qubit_densities_list) == len(two_qubit_densities_list):
         mutual_information_list = [_information(single_qubit_densities_list[index], two_qubit_densities_list[index])
                                    for index, _ in enumerate(single_qubit_densities_list)]
-        mutual_information_list = [_process_information(mutual_information)
+        mutual_information_list = [_get_information_matrix(mutual_information)
                                    for mutual_information in mutual_information_list]
         return mutual_information_list

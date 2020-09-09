@@ -1,2 +1,2 @@
-from . import reader
+from . import read
 from . import mutual
