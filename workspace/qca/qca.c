@@ -38,7 +38,7 @@ int main() {
     reportQuESTEnv(runtime);
     // prepare directories data
     char directory[128];
-    sprintf(directory, "./data/%u_qubits_%ur_%uc_%uru_%sic", nqubits, nrows, ncols, rule, ic);
+    sprintf(directory, "./data/%uqubits_%ur_%uc_%uru_%sic", nqubits, nrows, ncols, rule, ic);
     mkdir(directory, S_IRWXU);
     // apply the circuit
     printStatusMessage("Cycling the circuit");  // logging/logging.h

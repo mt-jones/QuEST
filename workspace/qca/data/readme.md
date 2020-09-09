@@ -1,6 +1,6 @@
 # data schema
 
-## {1}_qubits_{2}r_{3}c_{4}ru_{5}ic
+## `{1}qubits_{2}r_{3}c_{4}ru_{5}ic`
 
 1. the total number of qubits
 2. the number of rows in the qubit array
