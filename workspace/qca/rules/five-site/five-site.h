@@ -7,7 +7,6 @@
 #define FIVE_SITE_H
 #define NHOOD 5
 
-
 unsigned int * getNeighborhood(unsigned int row,
                                unsigned int col,
                                unsigned int nrows,
