@@ -1,3 +1,4 @@
+#include "nhood.h"
 #include "../../utilities/utilities.h"
 
 #pragma once
@@ -65,28 +66,25 @@ void setState(char * bitstring,
               unsigned int nrows,
               unsigned int ncols,
               bool rmajor,
-              char * state) {
-    if (!strcmp(state, "W")) {
-        unsigned int row = (unsigned int) floor(nrows / 2);
-        unsigned int col = (unsigned int) floor(ncols / 2);
-        unsigned int up = get1dIndex(row+1, col, nrows, ncols, rmajor);
-        unsigned int down = get1dIndex(row-1, col, nrows, ncols, rmajor);
-        unsigned int center = get1dIndex(row, col, nrows, ncols, rmajor);
-        unsigned int left = get1dIndex(row, col-1, nrows, ncols, rmajor);
-        unsigned int right = get1dIndex(row, col+1, nrows, ncols, rmajor);
-        if (indexIsValid(up, nrows, ncols)) {
-            bitstring[up] = '1';
+              unsigned int icval) {
+    unsigned int base = 2;
+    unsigned int nbits = NHOOD - 1;
+    char * ic = getValueBaseN(icval, base, nbits);
+    unsigned int row = (unsigned int) floor(nrows / 2);
+    unsigned int col = (unsigned int) floor(ncols / 2);
+    unsigned int up = get1dIndex(row-1, col, nrows, ncols, rmajor);
+    unsigned int down = get1dIndex(row+1, col, nrows, ncols, rmajor);
+    unsigned int left = get1dIndex(row, col-1, nrows, ncols, rmajor);
+    unsigned int right = get1dIndex(row, col+1, nrows, ncols, rmajor);
+    unsigned int indices[] = {up, down, left, right};
+    for (unsigned int i = 0; i < nbits; ++i) {
+        unsigned index = indices[i];
+        if (indexIsValid(index, nrows, ncols)) {
+            bitstring[index] = ic[i];
         }
-        if (indexIsValid(down, nrows, ncols)) {
-            bitstring[down] = '1';
-        }
-        if (indexIsValid(left, nrows, ncols)) {
-            bitstring[left] = '1';
-        }
-        if (indexIsValid(right, nrows, ncols)) {
-            bitstring[right] = '1';
-        }
+        putchar('\n');
     }
+    free(ic);
 }
 
 #endif

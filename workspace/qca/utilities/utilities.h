@@ -1,10 +1,37 @@
 #include "../external/external.h"
-#include <bits/types/FILE.h>
+#include "../logging/logging.h"
 
 #pragma once
 #if !defined UTILITIES_H
 #define UTILITIES_H
 #define INVALID UINT_MAX
+
+void initRNG() {
+    srand(time(NULL));
+}
+
+double rng(double rmin,
+           double rmax) {
+    double range = rmax - rmin;
+    double out = rmin + ((double) rand() / ((double) RAND_MAX)) * range;
+    return out;
+}
+
+unsigned int roll(unsigned int * vals,
+                  unsigned int nvals) {
+    unsigned int out = 0;
+    double rmin = 0;
+    double rmax = nvals;
+    double value = rng(rmin, rmax);
+    unsigned int index = 0;
+    for (unsigned int i = 0; i < nvals; ++i) {
+        if (i <= value && value < i + 1) {
+            index = i;
+        }
+    }
+    out = vals[index];
+    return out;
+}
 
 void swap(char * a,
           char * b) {
@@ -49,7 +76,8 @@ char * getValueBaseN(unsigned int val,
 
 unsigned int getValueBase10(char val) {
     unsigned int out = val;
-    out = ('A' <= val) ? out - 'A' : out - '0';
+	unsigned int hoffset = 10;
+    out = ('A' <= val) ? out - 'A' + hoffset : out - '0';
     return out;
 }
 
@@ -227,6 +255,19 @@ unsigned int * getPauliXTargets(char * signature,
     return out;
 }
 
+void pauliN(Qureg qubits,
+            unsigned int pcode,
+            unsigned int target) {
+    switch (pcode) {
+        case 1:
+            pauliX(qubits, (int) target);
+        case 2:
+            pauliY(qubits, (int) target);
+        case 3:
+            pauliZ(qubits, (int) target);
+    }
+}
+
 void multiPauliX(Qureg qubits,
                  unsigned int * targets) {
     for (unsigned int i = 0; i < targets[0]; ++i) {
@@ -237,8 +278,8 @@ void multiPauliX(Qureg qubits,
 ComplexMatrix2 getActivator(char * name) {
     ComplexMatrix2 activator;
     if (!strcmp(name, "Hadamard")) {
-        double reval[4] = {1/sqrt(2), 1/sqrt(2),
-                          1/sqrt(2), -1/sqrt(2)};
+        double reval[4] = {1/sqrt(2),  1/sqrt(2),
+                           1/sqrt(2), -1/sqrt(2)};
         activator = (ComplexMatrix2) {
             .real={{reval[0], reval[1]},
                    {reval[2], reval[3]}},
@@ -249,7 +290,18 @@ ComplexMatrix2 getActivator(char * name) {
         double reval[4] = {0.25 * (2 + sqrt(2)), 0.5 * 1/sqrt(2),
                            0.5 * 1/sqrt(2), 0.25 * (2 - sqrt(2))};
         double imval[4] = {0.25 * (2 - sqrt(2)), -0.5 * 1/sqrt(2),
-                           -0.5 * 1/sqrt(2), 0.25 * (2 + sqrt(2))};
+                          -0.5 * 1/sqrt(2), 0.25 * (2 + sqrt(2))};
+        activator = (ComplexMatrix2) {
+            .real={{reval[0], reval[1]},
+                   {reval[2], reval[3]}},
+            .imag={{imval[0], imval[1]},
+                   {imval[2], imval[3]}}
+        };
+    } else if (!strcmp(name, "Qurt-Hadamard")) {
+        double reval[4] = {0.25 * (-1 + sqrt(2)) + (1 + sqrt(2))/(2 * sqrt(2)), 0.25 * (1 - sqrt(2)) * (1 + sqrt(2)) + (-1 + sqrt(2)) * (1 + sqrt(2))/(2 * sqrt(2)),
+                          -0.25 + 1/(2 * sqrt(2)), (-1 + sqrt(2))/(2 * sqrt(2)) + 0.25 * (1 + sqrt(2))};
+        double imval[4] = {0.25 * (-1 + sqrt(2)), 0.25 * (1 - sqrt(2)) * (1 + sqrt(2)),
+                          -0.25, 0.25 * (1 + sqrt(2))};
         activator = (ComplexMatrix2) {
             .real={{reval[0], reval[1]},
                    {reval[2], reval[3]}},
@@ -259,22 +311,31 @@ ComplexMatrix2 getActivator(char * name) {
     } else if (!strcmp(name, "Pauli-X")) {
         double reval[4] = {0, 1,
                            1, 0};
+        double imval[4] = {0, 0,
+                           0, 0};
         activator = (ComplexMatrix2) {
             .real={{reval[0], reval[1]},
                    {reval[2], reval[3]}},
-            .imag={{0, 0},
-                   {0, 0}}
+            .imag={{imval[0], imval[1]},
+                   {imval[2], imval[3]}}
         };
     }
     return activator;
 }
+
+enum qubitGateMode {
+    twoQubitGates = 2,
+    fiveQubitGates = 5
+};
 
 void multiControlledActivator(Qureg qubits,
                               unsigned int * controls,
                               unsigned int nhood,
                               unsigned int target,
                               unsigned int level,
-                              ComplexMatrix2 activator) {
+                              ComplexMatrix2 activator,
+                              enum qubitGateMode mode,
+                              qreal qubitGateErr) {
     unsigned int nsignatures = nCr(controls[0], level);
     char ** signatures = getTotalisticRule(level, nhood);
     unsigned int * vcontrols = getValidValues(controls);
@@ -282,7 +343,30 @@ void multiControlledActivator(Qureg qubits,
         char * signature = signatures[i];
         unsigned int * ptargets = getPauliXTargets(signature, controls, nhood);
         multiPauliX(qubits, ptargets);
-        multiControlledUnitary(qubits, (int *) &vcontrols[1], vcontrols[0], target, activator);
+        if (mode == twoQubitGates) {
+            for (unsigned int j = 0; j < vcontrols[0]; ++j) {
+                controlledUnitary(qubits, vcontrols[j+1], target, activator);
+                if (qubitGateErr > 0) {
+                    double rmin = 0;
+                    double rmax = 100;
+                    double qubitGateErrRoll = rng(rmin, rmax);
+                    bool qubitGateErrQ = (qubitGateErrRoll <= qubitGateErr) ? true : false;
+                    if (qubitGateErrQ) {
+                        unsigned int validPauliCodes[] = {1, 2, 3};
+                        unsigned int npcodes = sizeof(validPauliCodes) / sizeof(unsigned int);
+                        unsigned int pauliCode = roll(validPauliCodes, npcodes);
+                        pauliN(qubits, pauliCode, target);
+                    }
+                }
+            }
+        } else if (mode == fiveQubitGates) {
+            multiControlledUnitary(qubits, (int *) &vcontrols[1], vcontrols[0], target, activator);
+        } else {
+            char buffer[256];
+            sprintf(buffer, "%s: %u", "Specified qubit gate mode is not supported", mode);
+            printStatusMessage(buffer);
+            exit(EXIT_FAILURE);
+        }
         multiPauliX(qubits, ptargets);
         free(ptargets);
     }
@@ -415,7 +499,7 @@ void *** getQubitDensity(Qureg qubits,
             }
             coeffs[i*npsequence+j+1] = (qreal *) calloc(nvals+1, sizeof(qreal));
             coeffs[i*npsequence+j+1][0] = nvals;
-            coeffs[i*npsequence+j+1][1] = calcExpecPauliProd(qubits, (int *) &targets[1], (enum pauliOpType *) pcodes, nreduced, workspace);
+            coeffs[i*npsequence+j+1][1] = calcExpecPauliProd(qubits, (int *) &targets[1], (enum pauliOpType *) &pcodes[1], nreduced, workspace);
         }
     }
     out[qindex] = (void **) qindices;

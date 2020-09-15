@@ -9,11 +9,14 @@ void printProductState(char * state,
                        unsigned int nrows,
                        unsigned int ncols,
                        bool rmajor) {
+    unsigned int nqubits = nrows * ncols;
+    reverse(state, nqubits);
     unsigned int bsize = 80;
+    const char * format = "%2c%1s|";
     char buffer[bsize];
     int length = sprintf(buffer, "|");
     for (unsigned int i = 0; i < nrows; ++i) {
-        length = length + sprintf(buffer, "%2c%1s|", '0', "");
+        length = length + sprintf(buffer, format, '0', "");
     }
     char pad = '-';
     char padding[length+1];
@@ -27,11 +30,12 @@ void printProductState(char * state,
         printf("%s", buffer);
         for (unsigned int i = 0; i < nrows; ++i) {
             unsigned int index = get1dIndex(i, j, nrows, ncols, rmajor);
-            sprintf(buffer, "%2c%1s|", state[index], "");
+            sprintf(buffer, format, state[index], "");
             printf("%s", buffer);
         }
         printf("\n%s\n", padding);
     }
+    reverse(state, nqubits);
 }
 
 void printProbabilityGrid(Qureg qubits,
@@ -58,7 +62,8 @@ void printProbabilityGrid(Qureg qubits,
         printf("%s", buffer);
         for (unsigned int i = 0; i < nrows; ++i) {
             unsigned int index = get1dIndex(i, j, nrows, ncols, rmajor);
-            sprintf(buffer, format, "", calcProbOfOutcome(qubits, index, outcome), "");
+            qreal prob = calcProbOfOutcome(qubits, index, outcome);
+            sprintf(buffer, format, "", prob, "");
             printf("%s", buffer);
         }
         printf("\n%s\n", padding);

@@ -1,7 +1,8 @@
 # data schema
 
-## `{1}qubits_{2}r_{3}c_{4}ru_{5}ic`
+## `{0}traj_{1}qubits_{2}r_{3}c_{4}ru_{5}ic`
 
+0. the trajectory index
 1. the total number of qubits
 2. the number of rows in the qubit array
 3. the number of columns in the qubit array
@@ -28,10 +29,19 @@ For our purposes, we will only consider neighborhoods whose size is odd. With th
 
 ## initial conditions
 
-In order for a rule to induce nontrivial evolution in a circuit cycle, there must be a seed state. The seed state or initial condition can produce dynamics with complexity under the application of the appropriate rule. Unlike the rule, the initial conditions are given names or signatures. For example, in 1-d:
+In order for a rule to induce nontrivial evolution in a circuit cycle, there must be a seed state. The seed state or initial condition can produce dynamics with complexity under the application of the appropriate rule. Like the rule, the initial condition is defined by the neighborhood of the system's global center (excluding the center). For example, in 1-d with a three-site neighborhood:
 
-1. `"W"`: `[000, ..., 0010100, ..., 000]`
-2. `"S"`: `[000, ..., 0001000, ..., 000]`
-3. TBA
+0. `[000 ... 000 ... 000]`; binary: `00`
+1. `[000 ... 001 ... 000]`; binary: `01`
+2. `[000 ... 100 ... 000]`; binary: `10`
+3. `[000 ... 101 ... 000]`; binary: `11`
 
-Alternatively, the initial condition can be specified manually.
+Similarly, in 1-d with a five-site neighborhood:
+
+0. `[000 ... 00000 ... 000]`; binary: `0000`
+1. `[000 ... 00001 ... 000]`; binary: `0001`
+2. `[000 ... 00010 ... 000]`; binary: `0010`
+3. `[000 ... 00011 ... 000]`; binary: `0011`
+4. ... and so on
+
+In 2-d with a five-site neighborhood, the initial condition bits are ordered: `[up, down, left, right]` from the system's global center.

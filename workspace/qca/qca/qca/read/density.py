@@ -32,6 +32,7 @@ def _read_binary_qubit_density_data(filepaths):
     if not isinstance(filepaths, list):
         filepaths = [filepaths]
     for filepath in filepaths:
+        filepath = os.path.abspath(filepath)
         if os.path.exists(filepath):
             with open(filepath, "rb") as file:
                 binary_qubit_density_data.append(file.read())
@@ -123,7 +124,7 @@ def _get_qubit_densities(qubit_density_terms):
                 if (unique_qindex == np.array(qubit_density_term[0])).all():
                     density_matrix = qubit_density_term[1]
                     coeff = qubit_density_term[2]
-                    _qubit_densities[index][1] = _qubit_densities[index][1] + coeff * density_matrix;
+                    _qubit_densities[index][1] = _qubit_densities[index][1] + coeff * density_matrix
         qubit_densities.append(_qubit_densities)
     return qubit_densities
 

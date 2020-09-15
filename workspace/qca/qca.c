@@ -1,11 +1,18 @@
 #include "external/external.h"
 #include "rules/five-site/five-site.h"
+#include "utilities/utilities.h"
 
 int main(int argc, char * argv[]) {
     char buffer[256];
     if (argc != numArgNames+1) {
-        sprintf(buffer, "%s", "invalid number of command line arguments");
+        sprintf(buffer, "%s", "Invalid number of command line arguments");
         printStatusMessage(buffer);  // logging/logging.h
+        sprintf(buffer, "%s", "Command line arguments must be specified as:");
+        printStatusMessage(buffer);  // logging/logging.h
+        for (unsigned int i = 0; i < numArgNames; ++i) {
+            sprintf(buffer, "%s=...", argNames[i]);
+            printStatusMessage(buffer);  // logging/logging.h
+        }
         exit(EXIT_FAILURE);
     }
     sprintf(buffer, "%s", "Printing command line inputs");
@@ -26,9 +33,9 @@ int main(int argc, char * argv[]) {
         sprintf(buffer, "%s: %s", argNames[i], argVals[i]);
         printStatusMessage(buffer);  // logging/logging.h
     }
-    bool rmajor = true;  // specify row-major layout
-    bool verbose = false;  // specify verbosity in update functions
-    // specify 2D qubit arrangement, neighborhood activation level, activator
+    bool rmajor = !strcmp(argVals[0], "true") ? true : false;  // specify row-major layout
+    bool verbose = !strcmp(argVals[1], "true") ? true : false;  // specify verbosity in update functions
+    // specify 2D qubit arrangement, qubit gate mode, qubit error, neighborhood activation level, activator
     char * endptr = NULL;
     unsigned int inputBase = 10;
     unsigned int nrows = strtoul(argVals[2], &endptr, inputBase);
@@ -47,7 +54,11 @@ int main(int argc, char * argv[]) {
     char * aname = argVals[5];
     ComplexMatrix2 activator = getActivator(aname);  // utilities/utilities.h
     // prepare initial condition
-    char * ic = argVals[6];
+    unsigned int ic = strtoul(argVals[6], &endptr, inputBase);
+    enum qubitGateMode gateMode = (enum qubitGateMode) strtoul(argVals[7], &endptr, inputBase);
+    bool openBoundaries = !strcmp(argVals[8], "true") ? true : false;  // specify whether or not to include a boundary of fixed qubits in the circuit
+    unsigned int trajectory = strtoul(argVals[9], &endptr, inputBase);
+    qreal gateErr = (qreal) strtod(argVals[10], &endptr);
     printStatusMessage("Printing initial cond.");  // logging/logging.h
     char * state = initBitString(nqubits);
     setState(state, nrows, ncols, rmajor, ic);  // rules/five-site/utilities.h
@@ -64,18 +75,25 @@ int main(int argc, char * argv[]) {
     printStatusMessage("Printing simulated quantum register and runtime info");  // logging/logging.h
     reportQuregParams(qubits);
     reportQuESTEnv(runtime);
-    // prepare directories data
+    // prepare data directories
     char directory[128];
-    sprintf(directory, "./data/%uqubits_%ur_%uc_%uru_%sic", nqubits, nrows, ncols, rule, ic);
+    sprintf(directory, "./data/%utraj_%uqubits_%ur_%uc_%uru_%uic_%umode_%4.2ferr", trajectory, nqubits, nrows, ncols, rule, ic, gateMode, gateErr);
     mkdir(directory, S_IRWXU);
     // apply the circuit
     printStatusMessage("Cycling the circuit");  // logging/logging.h
     int outcome = 1;
+    if (gateErr >= 0) {
+        initRNG();
+    } else {
+        sprintf(buffer, "%s: %4.2f", "Two qubit gate error must be greater than or equal to zero, but it was set to", gateErr);
+        printStatusMessage(buffer);  // logging/logging.h
+        exit(EXIT_FAILURE);
+    }
     printStatusMessage("Initial probability grid");  // logging/logging.h
     printProbabilityGrid(qubits, nrows, ncols, outcome, rmajor);  // rules/five-site/logging.h
-    unsigned int ncycles = strtoul(argVals[7], &endptr, inputBase);
+    unsigned int ncycles = strtoul(argVals[11], &endptr, inputBase);
     for(unsigned int i = 0; i < ncycles; ++i) {
-        updateQubits(qubits, nrows, ncols, levels, activator, rmajor, verbose);  // rules/five-site/five-site.h
+        updateQubits(qubits, nrows, ncols, levels, activator, rmajor, verbose, gateMode, openBoundaries, gateErr);  // rules/five-site/five-site.h
         syncQuESTEnv(runtime);
         sprintf(buffer, "Probability grid at cycle: %u", i);
         printStatusMessage(buffer);  // logging/logging.h
