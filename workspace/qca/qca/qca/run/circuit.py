@@ -18,8 +18,8 @@ def cycle(ncycles="1",
           rmajor="true",
           verbose="false",
           execute=False,
-          qca_root=os.path.abspath(os.getcwd())):
-    exe_qca = os.path.join(qca_root, os.path.abspath("./build/exe_qca"))
+          qca_root="./"):
+    exe_qca = os.path.join(qca_root, "build/exe_qca")
     if os.path.isfile(exe_qca):
         cmd = (f"{exe_qca} " +
                f"rmajor={rmajor} " +
@@ -47,7 +47,7 @@ def cycle(ncycles="1",
         gate_mode = int(gate_mode)
         gate_err = float(gate_err)
         outdir = os.path.abspath(f"data/{trajectory}traj_{nrows*ncols}qubits_{nrows}r_{ncols}c_{rule}ru_{ic}ic_{gate_mode}mode_{gate_err:4.2f}err")
-        outfiles = [[os.path.join(outdir, f"1_qubit_density_{cycle}_cyucle.bin"), os.path.join(outdir, f"1_qubit_density_{cycle}_cycle.bin")]
+        outfiles = [[os.path.join(outdir, f"1_qubit_density_{cycle}_cycle.bin"), os.path.join(outdir, f"2_qubit_density_{cycle}_cycle.bin")]
                     for cycle in range(ncycles)]
         return (cmd, out, err, outfiles)
     else:

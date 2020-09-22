@@ -6,7 +6,7 @@ MULTITHREADED=OFF
 DISTRIBUTED=OFF
 GPUACCELERATED=ON
 GPUCOMPUTECAPABILITY=75
-USER_SOURCE="$HOME/Workspace/csm/QuEST/workspace/qca/qca.c"
+USER_SOURCE="$QUEST_ROOT/workspace/qca/qca.c"
 OUTPUT_EXE="exe_qca"
 
 bash -c "../build-utilities/build-tool $QUEST_ROOT \

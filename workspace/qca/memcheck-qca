@@ -5,4 +5,4 @@ valgrind --leak-check=full \
          --track-origins=yes \
          --verbose \
          --log-file=qca-valgrind.out \
-         ./build/exe_qca
+         ./build/exe_qca rmajor=true verbose=false nrows=4 ncols=4 rule=12 activator=Qurt-Hadamard ic=15 gate-mode=5 open-boundaries=true trajectory=0 gate-err=0 ncycles=2
