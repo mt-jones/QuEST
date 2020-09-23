@@ -36,15 +36,15 @@ def _calculate_entropy(density, alpha):
     entropy = _entropy_operator(density, alpha)
     return entropy
 
-def _entropies(qubit_densities, alpha):
+def entropy(qubit_densities, alpha):
     entropies = [[qubit_density[0], _calculate_entropy(qubit_density[1], alpha)]
                  for qubit_density in qubit_densities]
     return entropies
 
 def _information(densities_args):
     single_qubit_densities, two_qubit_densities, alpha = densities_args
-    single_qubit_entropies = _entropies(single_qubit_densities, alpha)
-    two_qubit_entropies = _entropies(two_qubit_densities, alpha)
+    single_qubit_entropies = entropy(single_qubit_densities, alpha)
+    two_qubit_entropies = entropy(two_qubit_densities, alpha)
     mutual_information = []
     for single_qubit_index, single_qubit_entropyi in single_qubit_entropies:
         for single_qubit_jndex, single_qubit_entropyj in single_qubit_entropies:
@@ -94,3 +94,11 @@ def clustering(mutual_information_list, tolerance):
         clustering = pool.map(_clustering, [(mutual_information, tolerance)
                                             for mutual_information in mutual_information_list])
     return clustering
+
+def _calculate_polarization(single_qubit_density, index):
+    return single_qubit_density.diagonal()[index]
+
+def polarization(single_qubit_densities, index):
+    polarization = [[single_qubit_density[0], _calculate_polarization(single_qubit_density[1], index)]
+                 for single_qubit_density in single_qubit_densities]
+    return polarization

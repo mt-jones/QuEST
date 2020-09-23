@@ -91,7 +91,7 @@ void updateQubits(Qureg qubits,
                 }
                 for (unsigned int k = 0; k < nlevels; ++k) {
                     unsigned int level = levels[k+1];
-                    multiControlledActivator(qubits, controls, NHOOD, target, level, activator, mode, qubitGateErr);
+                    multiControlledActivator(qubits, controls, target, level, activator, mode, qubitGateErr);
                 }
                 free(neighborhood);
                 free(controls);

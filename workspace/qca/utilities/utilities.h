@@ -184,23 +184,19 @@ char ** getTotalisticRule(unsigned int level,
     unsigned int nnhoods = (unsigned int) pow(2, nhood-1);
     char ** out = (char **) calloc(nvalid, sizeof(char *));
     for (unsigned int i = 0; i < nvalid; ++i) {
-        out[i] = (char *) calloc(nhood, sizeof(char));
-        for (unsigned int j = 0; j < nhood; ++j) {
+        out[i] = (char *) calloc(nhood, sizeof(char));  // last character is null terminator
+        for (unsigned int j = 0; j < nhood-1; ++j) {
             out[i][j] = '0';
         }
     }
     unsigned int base = 2;
     unsigned int index = 0;
-    unsigned int center = (unsigned int) floor(nhood / 2);
     for (unsigned int i = 0; i < nnhoods; ++i) {
         char * neighbors = getValueBaseN(i, base, nhood-1);
-        if (getLevel(neighbors, nhood) == level) {
+        unsigned int activation = getLevel(neighbors, nhood);
+        if (activation == level) {
             for (unsigned int j = 0; j < nhood-1; ++j) {
-                if (j < center) {
-                    out[index][j] = neighbors[j];
-                } else {
-                    out[index][j+center-1] = neighbors[j];
-                }
+                out[index][j] = neighbors[j];
             }
             index = index + 1;
         }
@@ -233,20 +229,11 @@ unsigned int * getPauliXTargets(char * signature,
                                 unsigned int nhood) {
     unsigned int * out = initArray();
     unsigned int val, nvals = 1;
-    unsigned int center = (unsigned int) floor(nhood / 2);
-    for (unsigned int i = 0; i < nhood; ++i) {
+    for (unsigned int i = 0; i < controls[0]; ++i) {
         val = INVALID;
-        char bit = '\0';
-        if (i != center) {
-            bit = signature[i];
-        }
+        char bit = signature[i];
         if (bit == '0') {
-            if (i < center) {
-                val = controls[i+1];
-            }
-            if (center < i) {
-                val = controls[i];
-            }
+            val = controls[i+1];
             if (val != INVALID) {
                 out = appendArray(out, &val, nvals);
             }
@@ -330,18 +317,17 @@ enum qubitGateMode {
 
 void multiControlledActivator(Qureg qubits,
                               unsigned int * controls,
-                              unsigned int nhood,
                               unsigned int target,
                               unsigned int level,
                               ComplexMatrix2 activator,
                               enum qubitGateMode mode,
                               qreal qubitGateErr) {
-    unsigned int nsignatures = nCr(controls[0], level);
-    char ** signatures = getTotalisticRule(level, nhood);
     unsigned int * vcontrols = getValidValues(controls);
+    unsigned int nsignatures = nCr(vcontrols[0], level);
+    char ** signatures = getTotalisticRule(level, vcontrols[0]+1);
     for (unsigned int i = 0; i < nsignatures; ++i) {
         char * signature = signatures[i];
-        unsigned int * ptargets = getPauliXTargets(signature, controls, nhood);
+        unsigned int * ptargets = getPauliXTargets(signature, vcontrols, vcontrols[0]+1);
         multiPauliX(qubits, ptargets);
         if (mode == twoQubitGates) {
             for (unsigned int j = 0; j < vcontrols[0]; ++j) {
