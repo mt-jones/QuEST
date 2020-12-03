@@ -35,7 +35,7 @@ int main(int argc, char * argv[]) {
     }
     bool rmajor = !strcmp(argVals[0], "true") ? true : false;  // specify row-major layout
     bool verbose = !strcmp(argVals[1], "true") ? true : false;  // specify verbosity in update functions
-    // specify 2D qubit arrangement, qubit gate mode, qubit error, neighborhood activation level, activator
+    // specify 2D qubit arrangement, qubit gate mode, qubit error, neighborhood activation level
     char * endptr = NULL;
     unsigned int inputBase = 10;
     unsigned int nrows = strtoul(argVals[2], &endptr, inputBase);
@@ -51,14 +51,12 @@ int main(int argc, char * argv[]) {
         printStatusMessage(buffer);  // logging/logging.h
     }
     unsigned int nqubits = nrows * ncols;
-    char * aname = argVals[5];
-    ComplexMatrix2 activator = getActivator(aname);  // utilities/utilities.h
     // prepare initial condition
-    unsigned int ic = strtoul(argVals[6], &endptr, inputBase);
-    enum qubitGateMode gateMode = (enum qubitGateMode) strtoul(argVals[7], &endptr, inputBase);
-    bool openBoundaries = !strcmp(argVals[8], "true") ? true : false;  // specify whether or not to include a boundary of fixed qubits in the circuit
-    unsigned int trajectory = strtoul(argVals[9], &endptr, inputBase);
-    qreal gateErr = (qreal) strtod(argVals[10], &endptr);
+    unsigned int ic = strtoul(argVals[5], &endptr, inputBase);
+    enum qubitGateMode gateMode = (enum qubitGateMode) strtoul(argVals[6], &endptr, inputBase);
+    bool openBoundaries = !strcmp(argVals[7], "true") ? true : false;  // specify whether or not to include a boundary of fixed qubits in the circuit
+    unsigned int trajectory = strtoul(argVals[8], &endptr, inputBase);
+    qreal gateErr = (qreal) strtod(argVals[9], &endptr);
     printStatusMessage("Printing initial cond.");  // logging/logging.h
     char * state = initBitString(nqubits);
     setState(state, nrows, ncols, rmajor, ic);  // rules/five-site/utilities.h
@@ -91,14 +89,20 @@ int main(int argc, char * argv[]) {
     }
     printStatusMessage("Initial probability grid");  // logging/logging.h
     printProbabilityGrid(qubits, nrows, ncols, outcome, rmajor);  // rules/five-site/logging.h
-    unsigned int ncycles = strtoul(argVals[11], &endptr, inputBase);
-    for(unsigned int i = 0; i < ncycles; ++i) {
-        updateQubits(qubits, nrows, ncols, levels, activator, rmajor, verbose, gateMode, openBoundaries, gateErr);  // rules/five-site/five-site.h
+    unsigned int ncycles = strtoul(argVals[10], &endptr, inputBase);
+    unsigned int nreduced[] = {1, 2};
+    for (unsigned int j = 0; j < sizeof(nreduced) / sizeof(unsigned int); ++j) {
+        sprintf(buffer, "%s/%u_qubit_density_%u_cycle.bin", directory, nreduced[j], 0);
+        void*** density = getQubitDensity(qubits, nqubits, nreduced[j], workspace);  // utilities/utilities.h
+        writeQubitDensity(density, buffer);  // utilities/utilities.h
+        freeQubitDensity(density);  // utilities/utilities.h
+    }
+    for(unsigned int i = 1; i <= ncycles; ++i) {
+        updateQubits(qubits, nrows, ncols, levels, rmajor, verbose, gateMode, openBoundaries, gateErr);  // rules/five-site/five-site.h
         syncQuESTEnv(runtime);
         sprintf(buffer, "Probability grid at cycle: %u", i);
         printStatusMessage(buffer);  // logging/logging.h
         printProbabilityGrid(qubits, nrows, ncols, outcome, rmajor);  // rules/five-site/logging.h
-        unsigned int nreduced[] = {1, 2};
         for (unsigned int j = 0; j < sizeof(nreduced)/sizeof(unsigned int); ++j) {
             sprintf(buffer, "%s/%u_qubit_density_%u_cycle.bin", directory, nreduced[j], i);
             void *** density = getQubitDensity(qubits, nqubits, nreduced[j], workspace);  // utilities/utilities.h

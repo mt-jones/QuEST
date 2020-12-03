@@ -262,51 +262,48 @@ void multiPauliX(Qureg qubits,
     }
 }
 
-ComplexMatrix2 getActivator(char * name) {
+ComplexMatrix2 getActivator(unsigned int nneighbors) {
     ComplexMatrix2 activator;
-    if (!strcmp(name, "Hadamard")) {
-        double reval[4] = {1/sqrt(2),  1/sqrt(2),
-                           1/sqrt(2), -1/sqrt(2)};
-        activator = (ComplexMatrix2) {
-            .real={{reval[0], reval[1]},
-                   {reval[2], reval[3]}},
-            .imag={{0, 0},
-                   {0, 0}}
-        };
-    } else if (!strcmp(name, "Sqrt-Hadamard")) {
-        double reval[4] = {0.25 * (2 + sqrt(2)), 0.5 * 1/sqrt(2),
-                           0.5 * 1/sqrt(2), 0.25 * (2 - sqrt(2))};
-        double imval[4] = {0.25 * (2 - sqrt(2)), -0.5 * 1/sqrt(2),
-                          -0.5 * 1/sqrt(2), 0.25 * (2 + sqrt(2))};
-        activator = (ComplexMatrix2) {
-            .real={{reval[0], reval[1]},
-                   {reval[2], reval[3]}},
-            .imag={{imval[0], imval[1]},
-                   {imval[2], imval[3]}}
-        };
-    } else if (!strcmp(name, "Qurt-Hadamard")) {
-        double reval[4] = {0.25 * (-1 + sqrt(2)) + (1 + sqrt(2))/(2 * sqrt(2)), 0.25 * (1 - sqrt(2)) * (1 + sqrt(2)) + (-1 + sqrt(2)) * (1 + sqrt(2))/(2 * sqrt(2)),
-                          -0.25 + 1/(2 * sqrt(2)), (-1 + sqrt(2))/(2 * sqrt(2)) + 0.25 * (1 + sqrt(2))};
-        double imval[4] = {0.25 * (-1 + sqrt(2)), 0.25 * (1 - sqrt(2)) * (1 + sqrt(2)),
-                          -0.25, 0.25 * (1 + sqrt(2))};
-        activator = (ComplexMatrix2) {
-            .real={{reval[0], reval[1]},
-                   {reval[2], reval[3]}},
-            .imag={{imval[0], imval[1]},
-                   {imval[2], imval[3]}}
-        };
-    } else if (!strcmp(name, "Pauli-X")) {
-        double reval[4] = {0, 1,
-                           1, 0};
-        double imval[4] = {0, 0,
-                           0, 0};
-        activator = (ComplexMatrix2) {
-            .real={{reval[0], reval[1]},
-                   {reval[2], reval[3]}},
-            .imag={{imval[0], imval[1]},
-                   {imval[2], imval[3]}}
-        };
+    double revals[4];
+    double imvals[4];
+    switch (nneighbors) {
+    case 2:
+        // hadamard
+        revals[0] = (1) / (sqrt(2));
+        revals[1] = (1) / (sqrt(2));
+        revals[2] = (1) / (sqrt(2));
+        revals[3] = -(1) / (sqrt(2));
+        imvals[0] = 0;
+        imvals[1] = 0;
+        imvals[2] = 0;
+        imvals[3] = 0;
+    case 3:
+        // two-thirds-root hadamard
+        revals[0] = -(-1 + sqrt(2)) / (4 * sqrt(2)) + (1 + sqrt(2)) / (2 * sqrt(2));
+        revals[1] = (3) * (-1 + sqrt(2)) * (1 + sqrt(2)) / (4 * sqrt(2));
+        revals[2] = (3) / (4 * sqrt(2));
+        revals[3] = (-1 + sqrt(2)) / (2 * sqrt(2)) - (1 + sqrt(2)) / (4 * sqrt(2));
+        imvals[0] = (1 / 4) * (sqrt(3 / 2)) * (-1 + sqrt(2));
+        imvals[1] = -(1 / 4) * (sqrt(3 / 2)) * (-1 + sqrt(2)) * (1 + sqrt(2));
+        imvals[2] = -(sqrt(3 / 2)) / (4);
+        imvals[3] = (1 / 4) * (sqrt(3 / 2)) * (1 + sqrt(2));
+    case 4:
+        // square-root hadamard
+        revals[0] = (1 + sqrt(2)) / (2 * sqrt(2));
+        revals[1] = (-1 + sqrt(2)) * (1 + sqrt(2)) / (2 * sqrt(2));
+        revals[2] = (1) / (2 * sqrt(2));
+        revals[3] = (-1 + sqrt(2)) / (2 * sqrt(2));
+        imvals[0] = -(1 - sqrt(2)) / (2 * sqrt(2));
+        imvals[1] = (1 - sqrt(2)) * (1 + sqrt(2)) / (2 * sqrt(2));
+        imvals[2] = -(1) / (2 * sqrt(2));
+        imvals[3] = (1 + sqrt(2)) / (2 * sqrt(2));
     }
+    activator = (ComplexMatrix2){
+        .real = {{revals[0], revals[1]},
+                 {revals[2], revals[3]}},
+        .imag = {{imvals[0], imvals[1]},
+                 {imvals[2], imvals[3]}}
+    };
     return activator;
 }
 
@@ -319,10 +316,10 @@ void multiControlledActivator(Qureg qubits,
                               unsigned int * controls,
                               unsigned int target,
                               unsigned int level,
-                              ComplexMatrix2 activator,
                               enum qubitGateMode mode,
                               qreal qubitGateErr) {
     unsigned int * vcontrols = getValidValues(controls);
+    ComplexMatrix2 activator = getActivator(vcontrols[0]);
     unsigned int nsignatures = nCr(vcontrols[0], level);
     char ** signatures = getTotalisticRule(level, vcontrols[0]+1);
     for (unsigned int i = 0; i < nsignatures; ++i) {
