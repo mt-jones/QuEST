@@ -92,12 +92,12 @@ int main(int argc, char * argv[]) {
     unsigned int ncycles = strtoul(argVals[10], &endptr, inputBase);
     unsigned int nreduced[] = {1, 2};
     for (unsigned int j = 0; j < sizeof(nreduced) / sizeof(unsigned int); ++j) {
-        sprintf(buffer, "%s/%u_qubit_density_%u_cycle.bin", directory, nreduced[j], i);
+        sprintf(buffer, "%s/%u_qubit_density_%u_cycle.bin", directory, nreduced[j], 0);
         void*** density = getQubitDensity(qubits, nqubits, nreduced[j], workspace);  // utilities/utilities.h
         writeQubitDensity(density, buffer);  // utilities/utilities.h
         freeQubitDensity(density);  // utilities/utilities.h
     }
-    for(unsigned int i = 0; i < ncycles; ++i) {
+    for(unsigned int i = 1; i <= ncycles; ++i) {
         updateQubits(qubits, nrows, ncols, levels, rmajor, verbose, gateMode, openBoundaries, gateErr);  // rules/five-site/five-site.h
         syncQuESTEnv(runtime);
         sprintf(buffer, "Probability grid at cycle: %u", i);
