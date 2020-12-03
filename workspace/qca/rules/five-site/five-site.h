@@ -8,18 +8,19 @@
 #if !defined FIVE_SITE_H
 #define FIVE_SITE_H
 
-const char * argNames[] = {"rmajor",
-                           "verbose",
-                           "nrows",
-                           "ncols",
-                           "rule",
-                           "activator",
-                           "ic",
-                           "gate-mode",
-                           "open-boundaries",
-                           "trajectory",
-                           "gate-err",
-                           "ncycles"};
+const char * argNames[] = {
+    "rmajor", // 0
+    "verbose", // 1
+    "nrows", // 2
+    "ncols", // 3
+    "rule", // 4
+    "ic", // 5
+    "gate-mode", // 6
+    "open-boundaries", // 7
+    "trajectory", // 8
+    "gate-err", // 9
+    "ncycles" // 10
+};
 
 const unsigned int numArgNames = sizeof(argNames) / sizeof(char *);
 
@@ -60,7 +61,6 @@ void updateQubits(Qureg qubits,
                   unsigned int nrows,
                   unsigned int ncols,
                   unsigned int * levels,
-                  ComplexMatrix2 activator,
                   bool rmajor,
                   bool verbose,
                   enum qubitGateMode mode,
@@ -91,7 +91,7 @@ void updateQubits(Qureg qubits,
                         printNeighborhood(neighborhood, nrows, ncols, rmajor);
                     }
                     unsigned int level = levels[k+1];
-                    multiControlledActivator(qubits, controls, target, level, activator, mode, qubitGateErr);
+                    multiControlledActivator(qubits, controls, target, level, mode, qubitGateErr);
                     free(neighborhood);
                     free(controls);
                 }
