@@ -268,10 +268,10 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     switch (nneighbors) {
     case 2:
         // hadamard
-        revals[0] = (1) / (sqrt(2));
-        revals[1] = (1) / (sqrt(2));
-        revals[2] = (1) / (sqrt(2));
-        revals[3] = -(1) / (sqrt(2));
+        revals[0] = 1; // (1) / (sqrt(2));
+        revals[1] = 0; // (1) / (sqrt(2));
+        revals[2] = 0; // (1) / (sqrt(2));
+        revals[3] = 1; // -(1) / (sqrt(2));
         imvals[0] = 0;
         imvals[1] = 0;
         imvals[2] = 0;
