@@ -267,16 +267,18 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     double imvals[4];
     switch (nneighbors) {
     case 2:
+        printf("CASE 2 \n")
         // hadamard
-        revals[0] = 1; // (1) / (sqrt(2));
-        revals[1] = 0; // (1) / (sqrt(2));
-        revals[2] = 0; // (1) / (sqrt(2));
-        revals[3] = 1; // -(1) / (sqrt(2));
+        revals[0] = (1) / (sqrt(2));
+        revals[1] = (1) / (sqrt(2));
+        revals[2] = (1) / (sqrt(2));
+        revals[3] = -(1) / (sqrt(2));
         imvals[0] = 0;
         imvals[1] = 0;
         imvals[2] = 0;
         imvals[3] = 0;
     case 3:
+        printf("CASE 3 \n")
         // two-thirds-root hadamard
         revals[0] = -(-1 + sqrt(2)) / (4 * sqrt(2)) + (1 + sqrt(2)) / (2 * sqrt(2));
         revals[1] = (3) * (-1 + sqrt(2)) * (1 + sqrt(2)) / (4 * sqrt(2));
@@ -287,6 +289,7 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
         imvals[2] = -(sqrt(3 / 2)) / (4);
         imvals[3] = (1 / 4) * (sqrt(3 / 2)) * (1 + sqrt(2));
     case 4:
+        printf("CASE 4 \n")
         // square-root hadamard
         revals[0] = (1 + sqrt(2)) / (2 * sqrt(2));
         revals[1] = (-1 + sqrt(2)) * (1 + sqrt(2)) / (2 * sqrt(2));
