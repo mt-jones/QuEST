@@ -3,7 +3,7 @@
 #include "utilities/utilities.h"
 
 int main(int argc, char * argv[]) {
-    char buffer[128];
+    char buffer[256];
     if (argc != numArgNames+1) {
         sprintf(buffer, "%s", "Invalid number of command line arguments");
         printStatusMessage(buffer);  // logging/logging.h

@@ -11,7 +11,7 @@ void printProductState(char * state,
                        bool rmajor) {
     unsigned int nqubits = nrows * ncols;
     reverse(state, nqubits);
-    unsigned int bsize = 80;
+    unsigned int bsize = 1000;
     const char * format = "%2c%1s|";
     char buffer[bsize];
     int length = sprintf(buffer, "|");
