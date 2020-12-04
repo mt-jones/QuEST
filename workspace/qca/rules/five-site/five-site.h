@@ -81,7 +81,7 @@ void updateQubits(Qureg qubits,
     }
     unsigned int nlevels = levels[0];
     for (unsigned int k = 0; k < nlevels; ++k) {
-        for (unsigned int offset = 0; offset <= 1; ++offset) {
+        for (unsigned int offset = 0; offset <= 0; ++offset) {
             for (unsigned int i = frow; i < lcol; ++i) {
                 for (unsigned int j = fcol + (i + offset) % 2; j < lcol; j = j + 2) {
                     unsigned int* neighborhood = getNeighborhood(i, j, nrows, ncols, rmajor);
