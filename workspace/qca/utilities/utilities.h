@@ -324,6 +324,7 @@ void multiControlledActivator(Qureg qubits,
     char ** signatures = getTotalisticRule(level, vcontrols[0]+1);
     for (unsigned int i = 0; i < nsignatures; ++i) {
         char * signature = signatures[i];
+        printf("%s\n", signature);
         unsigned int * ptargets = getPauliXTargets(signature, vcontrols);
         multiPauliX(qubits, ptargets);
         if (mode == twoQubitGates) {
