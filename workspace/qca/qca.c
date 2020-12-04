@@ -93,7 +93,7 @@ int main(int argc, char * argv[]) {
     unsigned int nreduced[] = {1, 2};
     for (unsigned int j = 0; j < sizeof(nreduced) / sizeof(unsigned int); ++j) {
         //sprintf(buffer, "%s/%u_qubit_density_%u_cycle.bin", directory, nreduced[j], 0);
-        //void*** density = getQubitDensity(qubits, nqubits, nreduced[j], workspace);  // utilities/utilities.h
+        //void *** density = getQubitDensity(qubits, nqubits, nreduced[j], workspace);  // utilities/utilities.h
         //writeQubitDensity(density, buffer);  // utilities/utilities.h
         //freeQubitDensity(density);  // utilities/utilities.h
     }

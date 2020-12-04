@@ -266,6 +266,7 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     double imvals[4];
     if (nneighbors == 2) {
         // hadamard
+        printf("CASE 2 \n")
         revals[0] = 0.70710678118654752440084436210485;
         revals[1] = 0.70710678118654752440084436210485;
         revals[2] = 0.70710678118654752440084436210485;
@@ -276,6 +277,7 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
         imvals[3] = 0;
     } else if (nneighbors == 3) {
         // two-thirds-root hadamard
+        printf("CASE 3 \n")
         revals[0] = 0.78033008588991064330063327157864;
         revals[1] = 0.53033008588991064330063327157864;
         revals[2] = 0.53033008588991064330063327157864;
@@ -286,6 +288,7 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
         imvals[3] = 0.73919891974011658565652209471470;
     } else if (nneighbors == 4) {
         // square-root hadamard
+        printf("CASE 4 \n")
         revals[0] = 0.85355339059327376220042218105242;
         revals[1] = 0.35355339059327376220042218105242;
         revals[2] = 0.35355339059327376220042218105242;
