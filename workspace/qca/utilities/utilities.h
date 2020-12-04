@@ -268,10 +268,10 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     if (nneighbors == 2) {
         printf("CASE 2 \n");
         // hadamard
-        revals[0] = (sqrt(0.5));
-        revals[1] = (sqrt(0.5));
-        revals[2] = (sqrt(0.5));
-        revals[3] = -(sqrt(0.5));
+        revals[0] = 0.70710678118654752440084436210485;
+        revals[1] = 0.70710678118654752440084436210485;
+        revals[2] = 0.70710678118654752440084436210485;
+        revals[3] = -0.70710678118654752440084436210485;
         imvals[0] = 0;
         imvals[1] = 0;
         imvals[2] = 0;
@@ -279,25 +279,25 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     } else if (nneighbors == 3) {
         printf("CASE 3 \n");
         // two-thirds-root hadamard
-        revals[0] = (.25 + 3 * sqrt(0.03125));
-        revals[1] = (3) * (sqrt(0.03125));
-        revals[2] = (3) * (sqrt(0.03125));
-        revals[3] = (.25 - 3 * sqrt(0.03125));
-        imvals[0] = -(sqrt(3)) * (-0.25 + sqrt(0.03125));
-        imvals[1] = -(0.25) * (sqrt(1.5));
-        imvals[2] = -(0.25) * (sqrt(1.5));
-        imvals[3] = (sqrt(3)) * (.25 + sqrt(0.03125));
+        revals[0] = 0.78033008588991064330063327157864;
+        revals[1] = 0.53033008588991064330063327157864;
+        revals[2] = 0.53033008588991064330063327157864;
+        revals[3] = -0.28033008588991064330063327157864;
+        imvals[0] = 0.12682648404432206110720107603823;
+        imvals[1] = -0.30618621784789726227466050933824;
+        imvals[2] = -0.30618621784789726227466050933824;
+        imvals[3] = 0.73919891974011658565652209471470;
     } else if (nneighbors == 4) {
         printf("CASE 4 \n");
         // square-root hadamard
-        revals[0] = (0.5 + sqrt(0.125));
-        revals[1] = (0.5) * (sqrt(0.5));
-        revals[2] = (0.5) * (sqrt(0.5));
-        revals[3] = (0.5 - sqrt(0.125));
-        imvals[0] = (0.5 - sqrt(0.125));
-        imvals[1] = -(0.5) * (sqrt(0.5));
-        imvals[2] = -(0.5) * (sqrt(0.5));
-        imvals[3] = (0.5 + sqrt(0.125));
+        revals[0] = 0.85355339059327376220042218105242;
+        revals[1] = 0.35355339059327376220042218105242;
+        revals[2] = 0.35355339059327376220042218105242;
+        revals[3] = 0.14644660940672623779957781894758;
+        imvals[0] = 0.14644660940672623779957781894758;
+        imvals[1] = -0.35355339059327376220042218105242;
+        imvals[2] = -0.35355339059327376220042218105242;
+        imvals[3] = 0.85355339059327376220042218105242;
     }
     activator = (ComplexMatrix2) {
         .real = {{revals[0], revals[1]},
