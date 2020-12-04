@@ -290,14 +290,14 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     } else if (nneighbors == 4) {
         printf("CASE 4 \n");
         // square-root hadamard
-        revals[0] = (1 + sqrt(0.5));
+        revals[0] = (0.5 + sqrt(0.125));
         revals[1] = (0.5) * (sqrt(0.5));
         revals[2] = (0.5) * (sqrt(0.5));
-        revals[3] = (1 - sqrt(0.5));
-        imvals[0] = (1 - sqrt(0.5));
+        revals[3] = (0.5 - sqrt(0.125));
+        imvals[0] = (0.5 - sqrt(0.125));
         imvals[1] = -(0.5) * (sqrt(0.5));
         imvals[2] = -(0.5) * (sqrt(0.5));
-        imvals[3] = (1 + sqrt(0.5));
+        imvals[3] = (0.5 + sqrt(0.125));
     }
     activator = (ComplexMatrix2) {
         .real = {{revals[0], revals[1]},
