@@ -279,25 +279,25 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     } else if (nneighbors == 3) {
         printf("CASE 3 \n");
         // two-thirds-root hadamard
-        revals[0] = -(-1 + sqrt(2)) / (4 * sqrt(2)) + (1 + sqrt(2)) / (2 * sqrt(2));
-        revals[1] = (3) * (-1 + sqrt(2)) * (1 + sqrt(2)) / (4 * sqrt(2));
+        revals[0] = (1 / 8) * (2 + 3 * sqrt(2));
+        revals[1] = (3) / (4 * sqrt(2));
         revals[2] = (3) / (4 * sqrt(2));
-        revals[3] = (-1 + sqrt(2)) / (2 * sqrt(2)) - (1 + sqrt(2)) / (4 * sqrt(2));
-        imvals[0] = (1 / 4) * (sqrt(3 / 2)) * (-1 + sqrt(2));
-        imvals[1] = -(1 / 4) * (sqrt(3 / 2)) * (-1 + sqrt(2)) * (1 + sqrt(2));
-        imvals[2] = -(sqrt(3 / 2)) / (4);
-        imvals[3] = (1 / 4) * (sqrt(3 / 2)) * (1 + sqrt(2));
+        revals[3] = (1 / 8) * (2 - 3 * sqrt(2));
+        imvals[0] = -(1 / 8) * (sqrt(3)) * (-2 + sqrt(2));
+        imvals[1] = -(1 / 4) * (sqrt(3 / 2));
+        imvals[2] = -(1 / 4) * (sqrt(3 / 2));
+        imvals[3] = (1 / 8) * (sqrt(3)) * (2 + sqrt(2));
     } else if (nneighbors == 4) {
         printf("CASE 4 \n");
         // square-root hadamard
-        revals[0] = (1 + sqrt(2)) / (2 * sqrt(2));
-        revals[1] = (-1 + sqrt(2)) * (1 + sqrt(2)) / (2 * sqrt(2));
+        revals[0] = (1 / 2) * (2 + sqrt(2));
+        revals[1] = (1) / (2 * sqrt(2));
         revals[2] = (1) / (2 * sqrt(2));
-        revals[3] = (-1 + sqrt(2)) / (2 * sqrt(2));
-        imvals[0] = -(1 - sqrt(2)) / (2 * sqrt(2));
-        imvals[1] = (1 - sqrt(2)) * (1 + sqrt(2)) / (2 * sqrt(2));
+        revals[3] = (1 / 2) * (2 - sqrt(2));
+        imvals[0] = (1 / 2) * (2 - sqrt(2));
+        imvals[1] = -(1) / (2 * sqrt(2));
         imvals[2] = -(1) / (2 * sqrt(2));
-        imvals[3] = (1 + sqrt(2)) / (2 * sqrt(2));
+        imvals[3] = (1 / 2) * (2 + sqrt(2));
     }
     activator = (ComplexMatrix2){
         .real = {{revals[0], revals[1]},
