@@ -244,13 +244,12 @@ unsigned int * getPauliXTargets(char * signature,
 void pauliN(Qureg qubits,
             unsigned int pcode,
             unsigned int target) {
-    switch (pcode) {
-        case 1:
-            pauliX(qubits, (int) target);
-        case 2:
-            pauliY(qubits, (int) target);
-        case 3:
-            pauliZ(qubits, (int) target);
+    if (pcode == 1) {
+        pauliX(qubits, (int) target);
+    } else if (pcode == 2) {
+        pauliY(qubits, (int) target);
+    } else if (pcode == 3) {
+        pauliZ(qubits, (int) target);
     }
 }
 
@@ -266,7 +265,6 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
     double revals[4];
     double imvals[4];
     if (nneighbors == 2) {
-        printf("CASE 2 \n");
         // hadamard
         revals[0] = 0.70710678118654752440084436210485;
         revals[1] = 0.70710678118654752440084436210485;
@@ -277,7 +275,6 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
         imvals[2] = 0;
         imvals[3] = 0;
     } else if (nneighbors == 3) {
-        printf("CASE 3 \n");
         // two-thirds-root hadamard
         revals[0] = 0.78033008588991064330063327157864;
         revals[1] = 0.53033008588991064330063327157864;
@@ -288,7 +285,6 @@ ComplexMatrix2 getActivator(unsigned int nneighbors) {
         imvals[2] = -0.30618621784789726227466050933824;
         imvals[3] = 0.73919891974011658565652209471470;
     } else if (nneighbors == 4) {
-        printf("CASE 4 \n");
         // square-root hadamard
         revals[0] = 0.85355339059327376220042218105242;
         revals[1] = 0.35355339059327376220042218105242;
