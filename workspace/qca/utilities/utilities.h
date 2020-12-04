@@ -225,8 +225,7 @@ unsigned int * getControls(unsigned int * neighborhood) {
 }
 
 unsigned int * getPauliXTargets(char * signature,
-                                unsigned int * controls,
-                                unsigned int nhood) {
+                                unsigned int * controls) {
     unsigned int * out = initArray();
     unsigned int val, nvals = 1;
     for (unsigned int i = 0; i < controls[0]; ++i) {
@@ -324,7 +323,7 @@ void multiControlledActivator(Qureg qubits,
     char ** signatures = getTotalisticRule(level, vcontrols[0]+1);
     for (unsigned int i = 0; i < nsignatures; ++i) {
         char * signature = signatures[i];
-        unsigned int * ptargets = getPauliXTargets(signature, vcontrols, vcontrols[0]+1);
+        unsigned int * ptargets = getPauliXTargets(signature, vcontrols);
         multiPauliX(qubits, ptargets);
         if (mode == twoQubitGates) {
             for (unsigned int j = 0; j < vcontrols[0]; ++j) {
