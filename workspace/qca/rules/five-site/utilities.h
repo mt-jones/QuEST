@@ -68,15 +68,16 @@ void setState(char * bitstring,
               bool rmajor,
               unsigned int icval) {
     unsigned int base = 2;
-    unsigned int nbits = NHOOD - 1;
+    unsigned int nbits = NHOOD;
     char * ic = getValueBaseN(icval, base, nbits);
     unsigned int row = (unsigned int) floor(nrows / 2);
     unsigned int col = (unsigned int) floor(ncols / 2);
+    unsigned int center = get1dIndex(row, col, nrows, ncols, rmajor);
     unsigned int up = get1dIndex(row-1, col, nrows, ncols, rmajor);
     unsigned int down = get1dIndex(row+1, col, nrows, ncols, rmajor);
     unsigned int left = get1dIndex(row, col-1, nrows, ncols, rmajor);
     unsigned int right = get1dIndex(row, col+1, nrows, ncols, rmajor);
-    unsigned int indices[] = {up, down, left, right};
+    unsigned int indices[] = {center, up, down, left, right};
     for (unsigned int i = 0; i < nbits; ++i) {
         unsigned index = indices[i];
         if (indexIsValid(index, nrows, ncols)) {
