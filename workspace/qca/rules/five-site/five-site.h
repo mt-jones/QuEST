@@ -79,7 +79,6 @@ void updateQubits(Qureg qubits,
         fcol = 1;
         lcol = ncols - 1;
     }
-    unsigned int nlevels = levels[0];
     for (unsigned int offset = 0; offset <= 1; ++offset) {
         for (unsigned int i = frow; i < lcol; ++i) {
             for (unsigned int j = fcol + (i + offset) % 2; j < lcol; j = j + 2) {
@@ -89,6 +88,7 @@ void updateQubits(Qureg qubits,
                 if (verbose) {
                     printNeighborhood(neighborhood, nrows, ncols, rmajor);
                 }
+                unsigned int nlevels = levels[0];
                 for (unsigned int k = 0; k < nlevels; ++k) {
                     unsigned int level = levels[k + 1];
                     multiControlledActivator(qubits, controls, target, level, mode, qubitGateErr);
