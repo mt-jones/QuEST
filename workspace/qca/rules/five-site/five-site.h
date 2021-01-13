@@ -31,7 +31,7 @@ double * getControlProbabilities(Qureg qubits,
     double * out = (double *) calloc(ncontrols+1, sizeof(double));
     out[0] = ncontrols;
     for (unsigned int i = 0; i < controls[0]; ++i) {
-        out[i+1] = calcProbOfOutcome(qubits, controls[i+1], outcome)
+        out[i+1] = calcProbOfOutcome(qubits, controls[i+1], outcome);
     }
     return out;
 }
