@@ -314,7 +314,7 @@ void multiControlledActivator(Qureg qubits,
                               unsigned int target,
                               unsigned int level,
                               enum qubitGateMode mode,
-                              qreal qubitGateErr) {
+                              double qubitGateErr) {
     unsigned int * vcontrols = getValidValues(controls);
     ComplexMatrix2 activator = getActivator(vcontrols[0]);
     unsigned int nsignatures = nCr(vcontrols[0], level);
@@ -451,7 +451,7 @@ void *** getQubitDensity(Qureg qubits,
     }
     unsigned int ** qindices = (unsigned int **) calloc(nqdsequence*npsequence+1, sizeof(unsigned int *));
     unsigned int ** pindices = (unsigned int **) calloc(nqdsequence*npsequence+1, sizeof(unsigned int *));
-    qreal ** coeffs = (qreal **) calloc(nqdsequence*npsequence+1, sizeof(qreal *));
+    double ** coeffs = (double **) calloc(nqdsequence*npsequence+1, sizeof(double *));
     unsigned int nvals = 1;
     unsigned int length = nqdsequence * npsequence;
     qindices[0] = (unsigned int *) calloc(nvals+1, sizeof(unsigned int));
@@ -460,7 +460,7 @@ void *** getQubitDensity(Qureg qubits,
     pindices[0] = (unsigned int *) calloc(nvals+1, sizeof(unsigned int));
     pindices[0][0] = nvals;
     pindices[0][1] = length;
-    coeffs[0] = (qreal *) calloc(nvals+1, sizeof(qreal));
+    coeffs[0] = (double *) calloc(nvals+1, sizeof(double));
     coeffs[0][0] = nvals;
     coeffs[0][1] = length;
     unsigned int qlength = (qseq[0][0] >= 1) ? qseq[0][1] : qseq[0][0];
@@ -477,7 +477,7 @@ void *** getQubitDensity(Qureg qubits,
             for (unsigned int k = 0; k < pcodes[0]+1; ++k) {
                 pindices[i*npsequence+j+1][k] = pcodes[k];
             }
-            coeffs[i*npsequence+j+1] = (qreal *) calloc(nvals+1, sizeof(qreal));
+            coeffs[i*npsequence+j+1] = (double *) calloc(nvals+1, sizeof(double));
             coeffs[i*npsequence+j+1][0] = nvals;
             coeffs[i*npsequence+j+1][1] = calcExpecPauliProd(qubits, (int *) &targets[1], (enum pauliOpType *) &pcodes[1], nreduced, workspace);
         }
@@ -508,7 +508,7 @@ void writeQubitDensity(void *** density,
     unsigned int cindex = 2;
     unsigned int ** qindices = (unsigned int **) density[qindex];
     unsigned int ** pindices = (unsigned int **) density[pindex];
-    qreal ** coeffs = (qreal **) density[cindex];
+    double ** coeffs = (double **) density[cindex];
     unsigned int qlength = (qindices[0][0] >= 1) ? qindices[0][1] : qindices[0][0];
     unsigned int plength = (pindices[0][0] >= 1) ? pindices[0][1] : pindices[0][0];
     unsigned int clength = (coeffs[0][0] >= 1) ? coeffs[0][1] : coeffs[0][0];
@@ -534,10 +534,10 @@ void writeQubitDensity(void *** density,
     }
     for (unsigned int i = 0; i < clength; ++i) {
         unsigned int nvals = 1;
-        qreal * vals = coeffs[i+1];
+        double * vals = coeffs[i+1];
         for (unsigned int j = 0; j < vals[0]+1; ++j) {
-            qreal val = vals[j];
-            fwrite(&val, sizeof(qreal), nvals, fptr);
+            double val = vals[j];
+            fwrite(&val, sizeof(double), nvals, fptr);
         }
     }
     fclose(fptr);
@@ -549,7 +549,7 @@ void freeQubitDensity(void *** density) {
     unsigned int cindex = 2;
     unsigned int ** qindices = (unsigned int **) density[qindex];
     unsigned int ** pindices = (unsigned int **) density[pindex];
-    qreal ** coeffs = (qreal **) density[cindex];
+    double ** coeffs = (double **) density[cindex];
     unsigned int qlength = (qindices[0][0] >= 1) ? qindices[0][1] : qindices[0][0];
     unsigned int plength = (pindices[0][0] >= 1) ? pindices[0][1] : pindices[0][0];
     unsigned int clength = (coeffs[0][0] >= 1) ? coeffs[0][1] : coeffs[0][0];

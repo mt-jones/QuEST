@@ -56,7 +56,7 @@ int main(int argc, char * argv[]) {
     enum qubitGateMode gateMode = (enum qubitGateMode) strtoul(argVals[6], &endptr, inputBase);
     bool openBoundaries = !strcmp(argVals[7], "true") ? true : false;  // specify whether or not to include a boundary of fixed qubits in the circuit
     unsigned int trajectory = strtoul(argVals[8], &endptr, inputBase);
-    qreal gateErr = (qreal) strtod(argVals[9], &endptr);
+    double gateErr = (double) strtod(argVals[9], &endptr);
     printStatusMessage("Printing initial cond.");  // logging/logging.h
     char * state = initBitString(nqubits);
     setState(state, nrows, ncols, rmajor, ic);  // rules/five-site/utilities.h

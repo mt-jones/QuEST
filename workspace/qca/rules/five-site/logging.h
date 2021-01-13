@@ -62,7 +62,7 @@ void printProbabilityGrid(Qureg qubits,
         printf("%s", buffer);
         for (unsigned int i = 0; i < nrows; ++i) {
             unsigned int index = get1dIndex(i, j, nrows, ncols, rmajor);
-            qreal prob = calcProbOfOutcome(qubits, index, outcome);
+            double prob = calcProbOfOutcome(qubits, index, outcome);
             sprintf(buffer, format, "", prob, "");
             printf("%s", buffer);
         }

@@ -22,7 +22,39 @@ const char * argNames[] = {
     "ncycles" // 10
 };
 
-const unsigned int numArgNames = sizeof(argNames) / sizeof(char *);
+const unsigned int numArgNames = sizeof(argNames) / sizeof(char *); 
+
+double * getControlProbabilities(Qureg qubits,
+                                 unsigned int * controls,
+                                 unsigned int outcome) {
+    unsigned int ncontrols = controls[0];
+    double * out = (double *) calloc(ncontrols+1, sizeof(double));
+    out[0] = ncontrols;
+    for (unsigned int i = 0; i < controls[0]; ++i) {
+        out[i+1] = calcProbOfOutcome(qubits, controls[i+1], outcome)
+    }
+    return out;
+}
+
+unsigned int * getActivity(Qureg qubits,
+                           unsigned int * controls,
+                           unsigned int outcome) {
+    double * probabilities = getControlProbabilities(qubits, controls, outcome);
+    unsigned int * out = initArray();
+    unsigned int val, nvals = 1;
+    for (unsigned int i = 0; i < probabilities[0]; ++i) {
+        double probability = probabilities[i+1];
+        bool active = (probability > 0) ? true : false;
+        if (active) {
+            val = 1;
+        } else {
+            val = 0;
+        }
+        out = appendArray(out, &val, nvals);
+    }
+    free(probabilities);
+    return out;
+}
 
 unsigned int * getNeighborhood(unsigned int row,
                                unsigned int col,
@@ -65,7 +97,7 @@ void updateQubits(Qureg qubits,
                   bool verbose,
                   enum qubitGateMode mode,
                   bool openBoundaries,
-                  qreal qubitGateErr) {
+                  double qubitGateErr) {
     unsigned int frow, lrow;
     unsigned int fcol, lcol;
     if (openBoundaries) {
@@ -82,8 +114,8 @@ void updateQubits(Qureg qubits,
     for (unsigned int offset = 0; offset <= 1; ++offset) {
         for (unsigned int i = frow; i < lcol; ++i) {
             for (unsigned int j = fcol + (i + offset) % 2; j < lcol; j = j + 2) {
-                unsigned int* neighborhood = getNeighborhood(i, j, nrows, ncols, rmajor);
-                unsigned int* controls = getControls(neighborhood);
+                unsigned int * neighborhood = getNeighborhood(i, j, nrows, ncols, rmajor);
+                unsigned int * controls = getControls(neighborhood);
                 unsigned int target = getTarget(neighborhood);
                 if (verbose) {
                     printNeighborhood(neighborhood, nrows, ncols, rmajor);
