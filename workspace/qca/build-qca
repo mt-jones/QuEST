@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-QUEST_ROOT="$HOME/Workspace/csm/QuEST"
+QUEST_ROOT="$HOME/Workspace/research/QuEST"
 PRECISION=2
 MULTITHREADED=OFF
 DISTRIBUTED=OFF
