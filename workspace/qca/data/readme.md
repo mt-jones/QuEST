@@ -44,4 +44,4 @@ Similarly, in 1-d with a five-site neighborhood:
 3. `[000 ... 00011 ... 000]`; binary: `0011`
 4. ... and so on
 
-In 2-d with a five-site neighborhood, the initial condition bits are ordered: `[up, down, left, right]` from the system's global center.
+In 2-d with a five-site neighborhood, the initial condition bits are ordered: `[up, down, left, right, center]` where `center` is the floored center of the qubit array, and `[up, ...]` means "one qubit `up` from center" etc..

@@ -1,3 +1,13 @@
 build*/
 **/.DS_Store
 Doxygen_doc/
+
+workspace/qca/build*/
+workspace/qca/data/*gifs*
+workspace/qca/data/*traj*
+*.sh
+*.npy
+*.pyc
+*.png
+*.tar.gz
+.ipynb_checkpoints
