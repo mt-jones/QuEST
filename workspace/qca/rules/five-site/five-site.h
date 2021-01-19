@@ -36,26 +36,6 @@ double * getControlProbabilities(Qureg qubits,
     return out;
 }
 
-unsigned int * getActivity(Qureg qubits,
-                           unsigned int * controls,
-                           unsigned int outcome) {
-    double * probabilities = getControlProbabilities(qubits, controls, outcome);
-    unsigned int * out = initArray();
-    unsigned int val, nvals = 1;
-    for (unsigned int i = 0; i < probabilities[0]; ++i) {
-        double probability = probabilities[i+1];
-        bool active = (probability > 0) ? true : false;
-        if (active) {
-            val = 1;
-        } else {
-            val = 0;
-        }
-        out = appendArray(out, &val, nvals);
-    }
-    free(probabilities);
-    return out;
-}
-
 unsigned int * getNeighborhood(unsigned int row,
                                unsigned int col,
                                unsigned int nrows,

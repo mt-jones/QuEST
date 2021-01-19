@@ -260,41 +260,19 @@ void multiPauliX(Qureg qubits,
     }
 }
 
-ComplexMatrix2 getActivator(unsigned int nneighbors) {
+ComplexMatrix2 getActivator() {
     ComplexMatrix2 activator;
     double revals[4];
     double imvals[4];
-    if (nneighbors == 2) {
-        // hadamard
-        revals[0] = 0.70710678118654752440084436210485;
-        revals[1] = 0.70710678118654752440084436210485;
-        revals[2] = 0.70710678118654752440084436210485;
-        revals[3] = -0.70710678118654752440084436210485;
-        imvals[0] = 0;
-        imvals[1] = 0;
-        imvals[2] = 0;
-        imvals[3] = 0;
-    } else if (nneighbors == 3) {
-        // two-thirds-root hadamard
-        revals[0] = 0.78033008588991064330063327157864;
-        revals[1] = 0.53033008588991064330063327157864;
-        revals[2] = 0.53033008588991064330063327157864;
-        revals[3] = -0.28033008588991064330063327157864;
-        imvals[0] = 0.12682648404432206110720107603823;
-        imvals[1] = -0.30618621784789726227466050933824;
-        imvals[2] = -0.30618621784789726227466050933824;
-        imvals[3] = 0.73919891974011658565652209471470;
-    } else if (nneighbors == 4) {
-        // square-root hadamard
-        revals[0] = 0.85355339059327376220042218105242;
-        revals[1] = 0.35355339059327376220042218105242;
-        revals[2] = 0.35355339059327376220042218105242;
-        revals[3] = 0.14644660940672623779957781894758;
-        imvals[0] = 0.14644660940672623779957781894758;
-        imvals[1] = -0.35355339059327376220042218105242;
-        imvals[2] = -0.35355339059327376220042218105242;
-        imvals[3] = 0.85355339059327376220042218105242;
-    }
+    // square-root hadamard
+    revals[0] = 0.85355339059327376220042218105242;
+    revals[1] = 0.35355339059327376220042218105242;
+    revals[2] = 0.35355339059327376220042218105242;
+    revals[3] = 0.14644660940672623779957781894758;
+    imvals[0] = 0.14644660940672623779957781894758;
+    imvals[1] = -0.35355339059327376220042218105242;
+    imvals[2] = -0.35355339059327376220042218105242;
+    imvals[3] = 0.85355339059327376220042218105242;
     activator = (ComplexMatrix2) {
         .real = {{revals[0], revals[1]},
                  {revals[2], revals[3]}},
@@ -316,7 +294,7 @@ void multiControlledActivator(Qureg qubits,
                               enum qubitGateMode mode,
                               double qubitGateErr) {
     unsigned int * vcontrols = getValidValues(controls);
-    ComplexMatrix2 activator = getActivator(vcontrols[0]);
+    ComplexMatrix2 activator = getActivator();
     unsigned int nsignatures = nCr(vcontrols[0], level);
     char ** signatures = getTotalisticRule(level, vcontrols[0]+1);
     for (unsigned int i = 0; i < nsignatures; ++i) {
