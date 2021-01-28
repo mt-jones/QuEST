@@ -98,7 +98,7 @@ int main(int argc, char * argv[]) {
         freeQubitDensity(density);  // utilities/utilities.h
     }
     for(unsigned int i = 1; i <= ncycles; ++i) {
-        updateQubits(qubits, nrows, ncols, levels, rmajor, verbose, gateMode, openBoundaries, gateErr);  // rules/five-site/five-site.h
+        updateQubitsGateModeM(qubits, nrows, ncols, levels, rmajor, verbose, gateMode, openBoundaries, gateErr);  // rules/five-site/five-site.h
         syncQuESTEnv(runtime);
         sprintf(buffer, "Probability grid at cycle: %u", i);
         printStatusMessage(buffer);  // logging/logging.h

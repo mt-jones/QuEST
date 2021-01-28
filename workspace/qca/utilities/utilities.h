@@ -287,12 +287,40 @@ enum qubitGateMode {
     fiveQubitGates = 5
 };
 
-void multiControlledActivator(Qureg qubits,
-                              unsigned int * controls,
-                              unsigned int target,
-                              unsigned int level,
-                              enum qubitGateMode mode,
-                              double qubitGateErr) {
+void multiControlledUnitaryGateModeM(Qureg qubits,
+                                     int * controls,
+                                     int target,
+                                     ComplexMatrix2 u,
+                                     enum qubitGateMode mode,
+                                     double qubitGateErr) {
+    if (mode == fiveQubitGates) {
+        multiControlledUnitary(qubits, &controls[1], controls[0], target, u);
+        if (qubitGateErr > 0) {
+            double rmin = 0;
+            double rmax = 100;
+            double qubitGateErrRoll = rng(rmin, rmax);
+            bool qubitGateErrQ = (qubitGateErrRoll <= qubitGateErr) ? true : false;
+            if (qubitGateErrQ) {
+                unsigned int validPauliCodes[] = {1, 2, 3};
+                unsigned int npcodes = sizeof(validPauliCodes) / sizeof(unsigned int);
+                unsigned int pauliCode = roll(validPauliCodes, npcodes);
+                pauliN(qubits, pauliCode, target);
+            }
+        }
+    } else {
+        char buffer[256];
+        sprintf(buffer, "%s: %u", "Specified qubit gate mode is not supported", mode);
+        printStatusMessage(buffer);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void multiControlledActivatorGateModeM(Qureg qubits,
+                                       unsigned int * controls,
+                                       unsigned int target,
+                                       unsigned int level,
+                                       enum qubitGateMode mode,
+                                       double qubitGateErr) {
     unsigned int * vcontrols = getValidValues(controls);
     ComplexMatrix2 activator = getActivator();
     unsigned int nsignatures = nCr(vcontrols[0], level);
@@ -301,30 +329,7 @@ void multiControlledActivator(Qureg qubits,
         char * signature = signatures[i];
         unsigned int * ptargets = getPauliXTargets(signature, vcontrols);
         multiPauliX(qubits, ptargets);
-        if (mode == twoQubitGates) {
-            for (unsigned int j = 0; j < vcontrols[0]; ++j) {
-                controlledUnitary(qubits, vcontrols[j+1], target, activator);
-                if (qubitGateErr > 0) {
-                    double rmin = 0;
-                    double rmax = 100;
-                    double qubitGateErrRoll = rng(rmin, rmax);
-                    bool qubitGateErrQ = (qubitGateErrRoll <= qubitGateErr) ? true : false;
-                    if (qubitGateErrQ) {
-                        unsigned int validPauliCodes[] = {1, 2, 3};
-                        unsigned int npcodes = sizeof(validPauliCodes) / sizeof(unsigned int);
-                        unsigned int pauliCode = roll(validPauliCodes, npcodes);
-                        pauliN(qubits, pauliCode, target);
-                    }
-                }
-            }
-        } else if (mode == fiveQubitGates) {
-            multiControlledUnitary(qubits, (int *) &vcontrols[1], vcontrols[0], target, activator);
-        } else {
-            char buffer[256];
-            sprintf(buffer, "%s: %u", "Specified qubit gate mode is not supported", mode);
-            printStatusMessage(buffer);
-            exit(EXIT_FAILURE);
-        }
+        multiControlledUnitaryGateModeM(qubits, (int *) vcontrols, target, activator, mode, qubitGateErr);
         multiPauliX(qubits, ptargets);
         free(ptargets);
     }

@@ -69,15 +69,15 @@ unsigned int * getNeighborhood(unsigned int row,
     return out;
 }
 
-void updateQubits(Qureg qubits,
-                  unsigned int nrows,
-                  unsigned int ncols,
-                  unsigned int * levels,
-                  bool rmajor,
-                  bool verbose,
-                  enum qubitGateMode mode,
-                  bool openBoundaries,
-                  double qubitGateErr) {
+void updateQubitsGateModeM(Qureg qubits,
+                           unsigned int nrows,
+                           unsigned int ncols,
+                           unsigned int * levels,
+                           bool rmajor,
+                           bool verbose,
+                           enum qubitGateMode mode,
+                           bool openBoundaries,
+                           double qubitGateErr) {
     unsigned int frow, lrow;
     unsigned int fcol, lcol;
     if (openBoundaries) {
@@ -103,7 +103,7 @@ void updateQubits(Qureg qubits,
                 unsigned int nlevels = levels[0];
                 for (unsigned int k = 0; k < nlevels; ++k) {
                     unsigned int level = levels[k + 1];
-                    multiControlledActivator(qubits, controls, target, level, mode, qubitGateErr);
+                    multiControlledActivatorGateModeM(qubits, controls, target, level, mode, qubitGateErr);
                 }
                 free(neighborhood);
                 free(controls);
