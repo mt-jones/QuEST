@@ -304,7 +304,14 @@ void multiControlledUnitaryGateModeM(Qureg qubits,
                 unsigned int validPauliCodes[] = {1, 2, 3};
                 unsigned int npcodes = sizeof(validPauliCodes) / sizeof(unsigned int);
                 unsigned int pauliCode = roll(validPauliCodes, npcodes);
-                pauliN(qubits, pauliCode, target);
+                unsigned int nqcodes = controls[0] + 1;  // always 1 target
+                unsigned int validQubitCodes[nqcodes];  // create an array of qubit indices upon which to apply the random pauli operator
+                for (unsigned int i = 0; i < controls[0]; ++i) {
+                    validQubitCodes[i] = controls[i+1];
+                }
+                validQubitCodes[nqcodes-1] = target;
+                unsigned int qubitCode = roll(validQubitCodes, nqcodes);
+                pauliN(qubits, pauliCode, qubitCode);
             }
         }
     } else {
